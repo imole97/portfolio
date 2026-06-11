@@ -1,0 +1,110 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/skins/apple.css";
+@import "../styles/skins/material.css";
+@import "../styles/skins/windows.css";
+
+/* Expose spine + skin tokens to Tailwind's utility namespace. (DESIGN-SYSTEM §9) */
+@theme inline {
+  --font-sans: var(
+    --font-app,
+    -apple-system,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Inter",
+    system-ui,
+    sans-serif
+  );
+
+  --color-accent: var(--accent, #0a84ff);
+  --color-accent-2: var(--accent-2, #bf5af2);
+  --color-text-primary: var(--text-primary, #1c1c1e);
+  --color-text-secondary: var(--text-secondary, rgba(60, 60, 67, 0.6));
+  --color-separator: var(--separator, rgba(60, 60, 67, 0.18));
+
+  --radius-card: var(--radius-card, 20px);
+  --radius-sheet: var(--radius-sheet, 28px);
+  --radius-button: var(--radius-button, 12px);
+  --radius-pill: var(--radius-pill, 980px);
+}
+
+/* Neutral SSR skin — system fonts, no chrome, no flash. (DESIGN-SYSTEM §8) */
+html {
+  background: #f2f2f7;
+  color: #1c1c1e;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-skin="apple"]) {
+    background: #0a0a0a;
+    color: #ededed;
+  }
+}
+
+html[data-skin="apple"] {
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+body {
+  font-family: var(--font-app, -apple-system, "Inter", system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* The resolved skin fades in over the neutral SSR paint. */
+.skin-root {
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+.skin-root[data-ready="true"] {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skin-root {
+    transition: none;
+  }
+}
+
+@layer components {
+  /* Liquid glass surface. (DESIGN-SYSTEM §4.1 Materials) */
+  .glass {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    border: 1px solid var(--glass-border);
+    box-shadow:
+      inset 0 1px 0 var(--glass-highlight),
+      var(--glass-shadow);
+  }
+
+  /* Faint top-left specular light on raised surfaces. */
+  .glass-specular {
+    position: relative;
+    isolation: isolate;
+  }
+  .glass-specular::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.35) 0%,
+      rgba(255, 255, 255, 0) 35%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+/* Skin-styled focus ring. (DESIGN-SYSTEM §8) */
+:where(a, button, [tabindex], input):focus-visible {
+  outline: 2px solid var(--accent, #0a84ff);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 30%, transparent);
+}

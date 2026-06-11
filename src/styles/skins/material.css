@@ -1,0 +1,70 @@
+/* Android — Material You skin. (DESIGN-SYSTEM §4.2)
+   Color roles are injected at runtime by MaterialShell (dynamic color); this block
+   holds the static shape/radius spine and sensible fallbacks. */
+
+[data-skin="android"] {
+  /* Fallback roles (overridden inline by the dynamic-color generator). */
+  --md-primary: #6750a4;
+  --md-on-primary: #ffffff;
+  --md-primary-container: #eaddff;
+  --md-on-primary-container: #21005d;
+  --md-secondary-container: #e8def8;
+  --md-on-secondary-container: #1d192b;
+  --md-tertiary: #7d5260;
+  --md-tertiary-container: #ffd8e4;
+  --md-on-tertiary-container: #31111d;
+  --md-background: #fef7ff;
+  --md-on-background: #1d1b20;
+  --md-surface: #fef7ff;
+  --md-surface-container: #f3edf7;
+  --md-surface-container-high: #ece6f0;
+  --md-surface-variant: #e7e0ec;
+  --md-on-surface: #1d1b20;
+  --md-on-surface-variant: #49454f;
+  --md-outline: #79747e;
+  --md-outline-variant: #cac4d0;
+
+  /* Expressive shape scale. */
+  --md-radius-xs: 8px;
+  --md-radius-sm: 12px;
+  --md-radius-md: 16px;
+  --md-radius-lg: 28px;
+  --md-radius-xl: 36px;
+  --md-radius-full: 999px;
+
+  /* Emphasized easing + durations. */
+  --md-ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --md-dur-short: 200ms;
+  --md-dur-medium: 400ms;
+
+  background: var(--md-background);
+  color: var(--md-on-background);
+  font-family: var(--font-roboto, "Roboto Flex", system-ui, sans-serif);
+}
+
+@layer components {
+  /* Tonal elevation: surface tint overlay rather than heavy shadows. (§4.2) */
+  .md-surface {
+    background: var(--md-surface-container);
+    color: var(--md-on-surface);
+  }
+  .md-surface-high {
+    background: var(--md-surface-container-high);
+    color: var(--md-on-surface);
+  }
+
+  /* Press ripple host. */
+  .md-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+  .md-ripple > .md-ripple-ink {
+    position: absolute;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.16;
+    pointer-events: none;
+    transform: scale(0);
+    will-change: transform, opacity;
+  }
+}

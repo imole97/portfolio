@@ -1,0 +1,92 @@
+/* Windows — Fluent / Mica skin. (DESIGN-SYSTEM §4.3)
+   Mica on the app background, Acrylic for transient surfaces, reveal highlight on
+   hover, rounded-but-crisp geometry. Light + dark via prefers-color-scheme. */
+
+[data-skin="windows"] {
+  --fl-accent: #0067c0;
+  --fl-card: #fbfbfb;
+  --fl-text: #1a1a1a;
+  --fl-text-secondary: rgba(0, 0, 0, 0.6);
+  --fl-stroke: rgba(0, 0, 0, 0.08);
+  --fl-stroke-strong: rgba(0, 0, 0, 0.16);
+  --fl-acrylic: rgba(252, 252, 252, 0.72);
+  --fl-subtle-hover: rgba(0, 0, 0, 0.04);
+  --fl-reveal: rgba(0, 0, 0, 0.06);
+
+  /* Mica: a quiet desktop-tinted neutral that subtly samples the "wallpaper". */
+  --fl-mica:
+    radial-gradient(140% 120% at 15% 0%, rgba(0, 103, 192, 0.06), transparent 45%),
+    radial-gradient(120% 120% at 100% 0%, rgba(136, 96, 208, 0.06), transparent 40%),
+    #f3f3f3;
+
+  /* Crisper than Apple/Android. */
+  --fl-radius: 8px;
+  --fl-radius-sm: 4px;
+
+  background: var(--fl-mica);
+  background-attachment: fixed;
+  color: var(--fl-text);
+  font-family:
+    "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", var(--font-inter),
+    system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-skin="windows"] {
+    --fl-accent: #4cc2ff;
+    --fl-card: #2b2b2b;
+    --fl-text: #ffffff;
+    --fl-text-secondary: rgba(255, 255, 255, 0.7);
+    --fl-stroke: rgba(255, 255, 255, 0.08);
+    --fl-stroke-strong: rgba(255, 255, 255, 0.18);
+    --fl-acrylic: rgba(44, 44, 44, 0.74);
+    --fl-subtle-hover: rgba(255, 255, 255, 0.06);
+    --fl-reveal: rgba(255, 255, 255, 0.09);
+
+    --fl-mica:
+      radial-gradient(140% 120% at 15% 0%, rgba(76, 194, 255, 0.08), transparent 45%),
+      radial-gradient(120% 120% at 100% 0%, rgba(136, 96, 208, 0.1), transparent 40%),
+      #202020;
+  }
+}
+
+@layer components {
+  /* Mica/card surface with a 1px stroke defining the edge. (§4.3) */
+  .fluent-card {
+    background: var(--fl-card);
+    border: 1px solid var(--fl-stroke);
+    border-radius: var(--fl-radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Acrylic: more translucent + blurred, for flyouts / command surfaces. */
+  .acrylic {
+    background: var(--fl-acrylic);
+    -webkit-backdrop-filter: blur(30px) saturate(125%);
+    backdrop-filter: blur(30px) saturate(125%);
+    border: 1px solid var(--fl-stroke);
+  }
+
+  /* Reveal: a soft radial highlight follows the pointer over the surface.
+     --reveal-x/--reveal-y are set by useReveal on pointermove. (§4.3) */
+  .reveal {
+    position: relative;
+  }
+  .reveal::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 200ms ease;
+    background: radial-gradient(
+      120px circle at var(--reveal-x, 50%) var(--reveal-y, 50%),
+      var(--fl-reveal),
+      transparent 70%
+    );
+  }
+  .reveal[data-reveal="on"]::after {
+    opacity: 1;
+  }
+}

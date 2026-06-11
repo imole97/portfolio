@@ -1,0 +1,54 @@
+/* Apple — Liquid Glass skin variables. (DESIGN-SYSTEM §4.1)
+   Scoped to [data-skin="apple"]; supports light + dark via prefers-color-scheme. */
+
+[data-skin="apple"] {
+  --bg: #f2f2f7;
+
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-blur: 40px;
+  --glass-saturate: 180%;
+  --glass-highlight: rgba(255, 255, 255, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.35);
+
+  --accent: #0a84ff;
+  --accent-2: #bf5af2;
+
+  --text-primary: #1c1c1e;
+  --text-secondary: rgba(60, 60, 67, 0.6);
+  --separator: rgba(60, 60, 67, 0.18);
+
+  /* Radii */
+  --radius-card: 20px;
+  --radius-sheet: 28px;
+  --radius-button: 12px;
+  --radius-pill: 980px;
+
+  /* Wallpaper — a soft, light-bending gradient field. */
+  --wallpaper:
+    radial-gradient(120% 120% at 12% 8%, #cfe3ff 0%, rgba(207, 227, 255, 0) 45%),
+    radial-gradient(120% 120% at 90% 12%, #e9d6ff 0%, rgba(233, 214, 255, 0) 40%),
+    radial-gradient(140% 140% at 80% 95%, #d2f4ff 0%, rgba(210, 244, 255, 0) 50%),
+    linear-gradient(160deg, #eef1f8 0%, #e7ecf6 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-skin="apple"] {
+    --bg: #000000;
+
+    --glass-bg: rgba(30, 30, 32, 0.55);
+    --glass-highlight: rgba(255, 255, 255, 0.16);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
+
+    --text-primary: #ffffff;
+    --text-secondary: rgba(235, 235, 245, 0.6);
+    --separator: rgba(235, 235, 245, 0.16);
+
+    --wallpaper:
+      radial-gradient(120% 120% at 12% 8%, #1a2740 0%, rgba(26, 39, 64, 0) 45%),
+      radial-gradient(120% 120% at 90% 12%, #2a1a40 0%, rgba(42, 26, 64, 0) 40%),
+      radial-gradient(140% 140% at 80% 95%, #0e2a33 0%, rgba(14, 42, 51, 0) 50%),
+      linear-gradient(160deg, #0a0a0c 0%, #101018 100%);
+  }
+}
