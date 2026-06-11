@@ -3,8 +3,11 @@
 // macOS desktop shell — wallpaper + menu bar + dock + draggable glass windows
 // + Spotlight ⌘K. (DESIGN-SYSTEM §4.1 macOS)
 
+import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { content, sectionMeta, type SectionId } from "@/lib/content";
+import { useSkin } from "@/components/SkinProvider";
+import { getWallpaper } from "@/lib/wallpapers";
 import { useWindowManager } from "./windowManager";
 import { Window } from "./Window";
 import { MenuBar } from "./MenuBar";
@@ -24,6 +27,8 @@ function useViewport() {
 }
 
 export function AppleShell() {
+  const { wallpaper } = useSkin();
+  const wp = getWallpaper("macos", wallpaper);
   const manager = useWindowManager(["work"]);
   const viewport = useViewport();
   const [spotlightOpen, setSpotlightOpen] = useState(false);
@@ -53,21 +58,26 @@ export function AppleShell() {
   return (
     <main
       className="relative h-screen w-screen overflow-hidden"
-      style={{ background: "var(--wallpaper)" }}
+      style={{ background: "var(--bg)" }}
     >
+      {/* Desktop wallpaper — full-bleed image behind the menu bar, windows, and dock. */}
+      <div aria-hidden className="absolute inset-0 z-0">
+        <Image src={wp.src} alt="" fill priority sizes="100vw" className="object-cover" />
+      </div>
+
       <MenuBar focusedId={manager.focusedId} onOpenSpotlight={() => setSpotlightOpen(true)} />
 
-      {/* Desktop greeting — visible when no window covers it. */}
-      <div className="pointer-events-none absolute left-1/2 top-[16%] -translate-x-1/2 px-6 text-center">
-        <p className="text-[13px] uppercase tracking-[0.2em] text-[var(--text-secondary)]">
-          {content.hero.role}
-        </p>
+      {/* Desktop greeting — visible when no window covers it. A soft shadow keeps it
+          legible over any wallpaper. */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-[16%] z-[1] -translate-x-1/2 px-6 text-center text-white"
+        style={{ textShadow: "0 1px 24px rgba(0,0,0,0.45)" }}
+      >
+        <p className="text-[13px] uppercase tracking-[0.2em] opacity-80">{content.hero.role}</p>
         <h1 className="mt-2 text-[clamp(2rem,5vw,4rem)] font-semibold tracking-tight">
           {content.hero.name}
         </h1>
-        <p className="mx-auto mt-3 max-w-md text-[15px] text-[var(--text-secondary)]">
-          {content.hero.thesis}
-        </p>
+        <p className="mx-auto mt-3 max-w-md text-[15px] opacity-90">{content.hero.thesis}</p>
       </div>
 
       {/* Windows */}

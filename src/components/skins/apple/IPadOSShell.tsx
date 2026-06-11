@@ -3,10 +3,12 @@
 // iPad shell — two-pane (sidebar + detail) in landscape; single column with a
 // popover sidebar in portrait. (DESIGN-SYSTEM §4.1 iPad)
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { sectionMeta, type SectionId } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { liquidSettle } from "@/lib/motion/apple";
+import { getWallpaper } from "@/lib/wallpapers";
 import { Sidebar } from "./Sidebar";
 import { SECTION_COMPONENTS } from "./sections";
 
@@ -26,7 +28,8 @@ function useOrientation() {
 }
 
 export function IPadOSShell() {
-  const { reducedMotion } = useSkin();
+  const { reducedMotion, wallpaper } = useSkin();
+  const wp = getWallpaper("ipados", wallpaper);
   const portrait = useOrientation();
   const [active, setActive] = useState<SectionId>("work");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -49,11 +52,20 @@ export function IPadOSShell() {
   return (
     <main
       className="relative flex h-screen w-screen gap-3 overflow-hidden p-3"
-      style={{ background: "var(--wallpaper)", color: "var(--text-primary)" }}
+      style={{ background: "var(--bg)", color: "var(--text-primary)" }}
     >
-      {!portrait && <Sidebar active={active} onSelect={select} />}
+      {/* Wallpaper — full-bleed image; the glass sidebar + detail float over it. */}
+      <div aria-hidden className="absolute inset-0 z-0">
+        <Image src={wp.src} alt="" fill priority sizes="100vw" className="object-cover" />
+      </div>
 
-      <section className="glass glass-specular relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-[var(--radius-card)]">
+      {!portrait && (
+        <div className="relative z-10">
+          <Sidebar active={active} onSelect={select} />
+        </div>
+      )}
+
+      <section className="glass glass-specular relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden rounded-[var(--radius-card)]">
         {/* Detail toolbar */}
         <header
           className="flex h-12 shrink-0 items-center gap-3 px-4"

@@ -6,6 +6,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -19,8 +20,13 @@ import {
   type OS,
   type Skin,
 } from "@/lib/resolveSkin";
+import { DEFAULT_WALLPAPER, wallpaperScope } from "@/lib/wallpapers";
 
 const OVERRIDE_KEY = "portfolio:skin-override";
+const THEME_KEY = "portfolio:theme";
+const WALLPAPER_KEY = "portfolio:wallpapers";
+
+export type ThemeMode = "system" | "light" | "dark";
 
 export interface SkinContextValue {
   /** Concrete skin to render. "neutral" until mounted. */
@@ -33,6 +39,14 @@ export interface SkinContextValue {
   /** Force a skin (persisted) or pass null to clear the override. */
   setSkinOverride: (skin: Skin | null) => void;
   override: Skin | null;
+  /** Appearance preference: follow system, or force light/dark (persisted). */
+  theme: ThemeMode;
+  /** The effective light/dark after resolving "system". */
+  resolvedTheme: "light" | "dark";
+  setTheme: (theme: ThemeMode) => void;
+  /** Selected wallpaper id for the active skin ("" if the skin has none). Persisted per skin. */
+  wallpaper: string;
+  setWallpaper: (id: string) => void;
 }
 
 const SkinContext = createContext<SkinContextValue | null>(null);
@@ -66,14 +80,27 @@ export function SkinProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [override, setOverride] = useState<Skin | null>(null);
+  const [theme, setThemeState] = useState<ThemeMode>("system");
+  const [systemDark, setSystemDark] = useState(false);
+  // Wallpaper selection per skin scope, e.g. { ios: "neon", ipados: "air" }.
+  const [wallpapers, setWallpapers] = useState<Record<string, string>>({});
 
   // Resolve on mount.
   useEffect(() => {
-    const stored = (() => {
+    const read = (key: string) => {
       try {
-        return localStorage.getItem(OVERRIDE_KEY) as Skin | null;
+        return localStorage.getItem(key);
       } catch {
         return null;
+      }
+    };
+    const stored = read(OVERRIDE_KEY) as Skin | null;
+    const storedTheme = read(THEME_KEY) as ThemeMode | null;
+    const storedWallpapers = (() => {
+      try {
+        return JSON.parse(read(WALLPAPER_KEY) ?? "{}") as Record<string, string>;
+      } catch {
+        return {};
       }
     })();
 
@@ -87,18 +114,36 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     setFormFactor(resolved.formFactor);
     setOverride(stored);
     setSkin(stored ?? resolved.skin);
+    if (storedTheme) setThemeState(storedTheme);
+    setWallpapers(storedWallpapers);
     setReady(true);
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
-  // Track reduced-motion preference live.
+  // Track reduced-motion + system color-scheme preferences live.
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const apply = () => setReducedMotion(mq.matches);
-    apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const dark = window.matchMedia("(prefers-color-scheme: dark)");
+    const applyMotion = () => setReducedMotion(motion.matches);
+    const applyDark = () => setSystemDark(dark.matches);
+    applyMotion();
+    applyDark();
+    motion.addEventListener("change", applyMotion);
+    dark.addEventListener("change", applyDark);
+    return () => {
+      motion.removeEventListener("change", applyMotion);
+      dark.removeEventListener("change", applyDark);
+    };
   }, []);
+
+  const resolvedTheme: "light" | "dark" =
+    theme === "system" ? (systemDark ? "dark" : "light") : theme;
+
+  // Reflect the appearance override onto <html data-theme>; absent = follow system.
+  useEffect(() => {
+    if (theme === "system") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   // Re-resolve on resize (form factor can change) unless an override is set.
   useEffect(() => {
@@ -134,9 +179,62 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const setTheme = (next: ThemeMode) => {
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch {
+      /* storage may be unavailable; in-memory state still updates */
+    }
+    setThemeState(next);
+  };
+
+  // Resolve the active skin's wallpaper (its saved choice, or the scope's default).
+  const scope = wallpaperScope(skin);
+  const wallpaper = scope ? (wallpapers[scope] ?? DEFAULT_WALLPAPER[scope]) : "";
+
+  const setWallpaper = useCallback(
+    (id: string) => {
+      if (!scope) return;
+      setWallpapers((prev) => {
+        const next = { ...prev, [scope]: id };
+        try {
+          localStorage.setItem(WALLPAPER_KEY, JSON.stringify(next));
+        } catch {
+          /* storage may be unavailable; in-memory state still updates */
+        }
+        return next;
+      });
+    },
+    [scope],
+  );
+
   const value = useMemo<SkinContextValue>(
-    () => ({ skin, os, formFactor, ready, reducedMotion, setSkinOverride, override }),
-    [skin, os, formFactor, ready, reducedMotion, override],
+    () => ({
+      skin,
+      os,
+      formFactor,
+      ready,
+      reducedMotion,
+      setSkinOverride,
+      override,
+      theme,
+      resolvedTheme,
+      setTheme,
+      wallpaper,
+      setWallpaper,
+    }),
+    [
+      skin,
+      os,
+      formFactor,
+      ready,
+      reducedMotion,
+      override,
+      theme,
+      resolvedTheme,
+      wallpaper,
+      setWallpaper,
+    ],
   );
 
   return <SkinContext.Provider value={value}>{children}</SkinContext.Provider>;

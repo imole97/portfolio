@@ -21,9 +21,6 @@ function buildIndex(): Result[] {
   content.work.forEach((w) =>
     items.push({ id: `w-${w.slug}`, label: w.title, hint: "Case study", section: "work" }),
   );
-  content.play.forEach((p) =>
-    items.push({ id: `p-${p.title}`, label: p.title, hint: "Experiment", section: "play" }),
-  );
   return items;
 }
 

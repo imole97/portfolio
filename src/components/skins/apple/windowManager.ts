@@ -31,7 +31,7 @@ const MIN_H = 240;
 const DEFAULTS: Record<SectionId, Bounds> = {
   work: { x: 120, y: 90, w: 760, h: 540 },
   about: { x: 200, y: 140, w: 600, h: 460 },
-  play: { x: 260, y: 110, w: 640, h: 480 },
+  settings: { x: 260, y: 110, w: 600, h: 480 },
   contact: { x: 320, y: 170, w: 520, h: 420 },
 };
 

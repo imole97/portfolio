@@ -5,7 +5,7 @@
 
 import { content, sectionMeta, type SectionId } from "@/lib/content";
 
-const ITEMS: SectionId[] = ["work", "about", "play", "contact"];
+const ITEMS: SectionId[] = ["work", "about", "settings", "contact"];
 
 interface SidebarProps {
   active: SectionId;

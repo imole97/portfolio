@@ -31,8 +31,9 @@
     system-ui, sans-serif;
 }
 
+/* Dark values — under system-dark (unless forced light) or explicit data-theme=dark. */
 @media (prefers-color-scheme: dark) {
-  [data-skin="windows"] {
+  [data-skin="windows"]:not([data-theme="light"]) {
     --fl-accent: #4cc2ff;
     --fl-card: #2b2b2b;
     --fl-text: #ffffff;
@@ -48,6 +49,23 @@
       radial-gradient(120% 120% at 100% 0%, rgba(136, 96, 208, 0.1), transparent 40%),
       #202020;
   }
+}
+
+[data-skin="windows"][data-theme="dark"] {
+  --fl-accent: #4cc2ff;
+  --fl-card: #2b2b2b;
+  --fl-text: #ffffff;
+  --fl-text-secondary: rgba(255, 255, 255, 0.7);
+  --fl-stroke: rgba(255, 255, 255, 0.08);
+  --fl-stroke-strong: rgba(255, 255, 255, 0.18);
+  --fl-acrylic: rgba(44, 44, 44, 0.74);
+  --fl-subtle-hover: rgba(255, 255, 255, 0.06);
+  --fl-reveal: rgba(255, 255, 255, 0.09);
+
+  --fl-mica:
+    radial-gradient(140% 120% at 15% 0%, rgba(76, 194, 255, 0.08), transparent 45%),
+    radial-gradient(120% 120% at 100% 0%, rgba(136, 96, 208, 0.1), transparent 40%),
+    #202020;
 }
 
 @layer components {

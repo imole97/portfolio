@@ -11,7 +11,7 @@ import { NavigationView } from "./NavigationView";
 import { CommandBar } from "./CommandBar";
 import { FLUENT_SECTIONS } from "./sections";
 
-const DESTINATIONS: SectionId[] = ["work", "about", "play", "contact"];
+const DESTINATIONS: SectionId[] = ["work", "about", "settings", "contact"];
 
 export function FluentShell() {
   const { formFactor } = useSkin();

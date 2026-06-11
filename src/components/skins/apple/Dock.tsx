@@ -8,7 +8,7 @@ import { sectionMeta, type SectionId } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { createDockMagnifier } from "@/lib/motion/apple";
 
-const DOCK_ITEMS: SectionId[] = ["work", "about", "play", "contact"];
+const DOCK_ITEMS: SectionId[] = ["work", "about", "settings", "contact"];
 
 interface DockProps {
   onOpen: (id: SectionId) => void;

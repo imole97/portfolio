@@ -3,15 +3,18 @@
 // iPhone shell — single column, collapsing large title, floating glass tab bar.
 // (DESIGN-SYSTEM §4.1 iPhone) Reuses the shared glass section components + motion.
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { content, sectionMeta, type SectionId } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { liquidSettle } from "@/lib/motion/apple";
+import { getWallpaper } from "@/lib/wallpapers";
 import { TabBar } from "./TabBar";
 import { SECTION_COMPONENTS } from "./sections";
 
 export function IOSShell() {
-  const { reducedMotion } = useSkin();
+  const { reducedMotion, wallpaper } = useSkin();
+  const wp = getWallpaper("ios", wallpaper);
   const [active, setActive] = useState<SectionId>("work");
   const [collapsed, setCollapsed] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -48,6 +51,22 @@ export function IOSShell() {
       className="relative flex h-screen w-screen flex-col overflow-hidden"
       style={{ background: "var(--bg)", color: "var(--text-primary)" }}
     >
+      {/* Wallpaper — full-bleed image with a theme-aware frosted scrim for legibility. */}
+      <div aria-hidden className="absolute inset-0 z-0">
+        <Image
+          src={wp.src}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: "color-mix(in srgb, var(--bg) 55%, transparent)" }}
+        />
+      </div>
+
       {/* Compact nav bar — small title fades in once the large title scrolls away. */}
       <header
         className="glass absolute inset-x-0 top-0 z-[200] flex items-end justify-center pb-2"
@@ -70,7 +89,7 @@ export function IOSShell() {
 
       <div
         ref={scrollRef}
-        className="flex-1 overflow-auto overscroll-contain px-4 pb-32"
+        className="relative z-10 flex-1 overflow-auto overscroll-contain px-4 pb-32"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 52px)" }}
       >
         {/* Large title (scrolls away). */}

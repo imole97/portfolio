@@ -2,7 +2,7 @@
 // Every skin consumes this — write once, render N ways. (DESIGN-SYSTEM §5, §9)
 // Swap the placeholder copy below for your real details; the shape stays the same.
 
-export type SectionId = "work" | "about" | "play" | "contact";
+export type SectionId = "work" | "about" | "settings" | "contact";
 
 export interface Hero {
   name: string;
@@ -255,6 +255,6 @@ export const sectionMeta: Record<
 > = {
   work: { label: "Work", emoji: "🗂️", title: "Selected Work" },
   about: { label: "About", emoji: "👤", title: "About Me" },
-  play: { label: "Play", emoji: "🎨", title: "Play" },
+  settings: { label: "Settings", emoji: "⚙️", title: "Settings" },
   contact: { label: "Contact", emoji: "✉️", title: "Contact" },
 };

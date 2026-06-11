@@ -13,26 +13,11 @@ import { NavRail } from "./NavRail";
 import { FAB } from "./FAB";
 import { MATERIAL_SECTIONS } from "./sections";
 
-const DESTINATIONS: SectionId[] = ["work", "about", "play"];
-
-function useColorScheme() {
-  const [dark, setDark] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches,
-  );
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => setDark(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-  return dark;
-}
+const DESTINATIONS: SectionId[] = ["work", "about", "settings"];
 
 export function MaterialShell() {
-  const { formFactor } = useSkin();
-  const dark = useColorScheme();
+  const { formFactor, resolvedTheme } = useSkin();
+  const dark = resolvedTheme === "dark"; // follows the Settings appearance override
   // Seed dynamic color from ?seed= for the live demo (recruiter delight). (§4.2)
   const [seed] = useState<string>(() => readSeedFromLocation());
   const [active, setActive] = useState<SectionId>("work");

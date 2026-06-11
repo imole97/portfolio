@@ -6,7 +6,7 @@
 import { sectionMeta, type SectionId } from "@/lib/content";
 import { cn } from "@/lib/cn";
 
-const TABS: SectionId[] = ["work", "about", "play", "contact"];
+const TABS: SectionId[] = ["work", "about", "settings", "contact"];
 
 interface TabBarProps {
   active: SectionId;

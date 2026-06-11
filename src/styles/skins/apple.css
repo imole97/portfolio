@@ -32,8 +32,10 @@
     linear-gradient(160deg, #eef1f8 0%, #e7ecf6 100%);
 }
 
+/* Dark values. Applied when the system prefers dark AND no explicit light override,
+   or when the appearance is forced to dark via [data-theme="dark"]. (Settings) */
 @media (prefers-color-scheme: dark) {
-  [data-skin="apple"] {
+  [data-skin="apple"]:not([data-theme="light"]) {
     --bg: #000000;
 
     --glass-bg: rgba(30, 30, 32, 0.55);
@@ -51,4 +53,23 @@
       radial-gradient(140% 140% at 80% 95%, #0e2a33 0%, rgba(14, 42, 51, 0) 50%),
       linear-gradient(160deg, #0a0a0c 0%, #101018 100%);
   }
+}
+
+[data-skin="apple"][data-theme="dark"] {
+  --bg: #000000;
+
+  --glass-bg: rgba(30, 30, 32, 0.55);
+  --glass-highlight: rgba(255, 255, 255, 0.16);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
+
+  --text-primary: #ffffff;
+  --text-secondary: rgba(235, 235, 245, 0.6);
+  --separator: rgba(235, 235, 245, 0.16);
+
+  --wallpaper:
+    radial-gradient(120% 120% at 12% 8%, #1a2740 0%, rgba(26, 39, 64, 0) 45%),
+    radial-gradient(120% 120% at 90% 12%, #2a1a40 0%, rgba(42, 26, 64, 0) 40%),
+    radial-gradient(140% 140% at 80% 95%, #0e2a33 0%, rgba(14, 42, 51, 0) 50%),
+    linear-gradient(160deg, #0a0a0c 0%, #101018 100%);
 }

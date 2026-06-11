@@ -27,6 +27,13 @@ only the chrome, motion, and materials adapt. See [`DESIGN-SYSTEM.md`](./DESIGN-
   reveal highlight, Segoe UI Variable, a Mica title bar with caption buttons, a collapsible
   NavigationView (expanded pane ↔ icon rail), a command bar with ⌘K search, and the signature
   **connected animation** (thumbnail flies into the detail header).
+- **Settings + appearance (all skins):** every skin has a native **Settings** destination (replaces
+  Play) with a light / dark / automatic **appearance** switch — a persisted, manual theme override
+  (`data-theme`) layered over `prefers-color-scheme`, applied across all skins. The **Apple** skins
+  (macOS · iPhone · iPad) also have a **wallpaper picker** backed by real image wallpapers rendered
+  behind the chrome (macOS: Sonoma · Ventura · Big Sur; iPhone: Aurora · Neon; iPad: Sequoia · Air).
+  Wallpaper choice is stored **per skin** so each device keeps its own; theme + wallpapers persist in
+  `localStorage`. (Wallpaper for Android/Windows is a follow-up.)
 - **Skin routing:** Apple → iOS / iPadOS / macOS by form factor; Android → Material (adapts up to
   expanded layouts); Windows → Fluent (scales down to a compact icon rail); unknown/Linux desktops
   fall back to macOS. All five skins are code-split and selectable live via the corner switcher.
