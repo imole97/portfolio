@@ -91,12 +91,17 @@ export function genRoles(seedHex: string, dark: boolean): MaterialRoles {
   };
 }
 
-/** Read an optional ?seed= override for the live dynamic-color demo. */
-export function readSeedFromLocation(): string {
-  if (typeof window === "undefined") return DEFAULT_SEED;
+/** Read the ?seed= override if present and valid, else null. */
+export function readSeedParam(): string | null {
+  if (typeof window === "undefined") return null;
   const param = new URLSearchParams(window.location.search).get("seed");
   if (param && /^#?[0-9a-fA-F]{6}$/.test(param)) {
     return param.startsWith("#") ? param : `#${param}`;
   }
-  return DEFAULT_SEED;
+  return null;
+}
+
+/** Read an optional ?seed= override for the live dynamic-color demo. */
+export function readSeedFromLocation(): string {
+  return readSeedParam() ?? DEFAULT_SEED;
 }

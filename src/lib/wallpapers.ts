@@ -8,12 +8,14 @@ export interface Wallpaper {
   src: string;
   /** Average luminance — informs scrim/contrast handling. */
   tone: "dark" | "light";
+  /** Material You only: seed hue that drives dynamic color when this wallpaper is set. */
+  seed?: string;
 }
 
-/** Skins that have a selectable wallpaper. */
-export type WallpaperScope = "ios" | "ipados" | "macos";
+/** Skins that have a selectable wallpaper (keyed by the skin value). */
+export type WallpaperScope = "ios" | "ipados" | "macos" | "material";
 
-const SCOPES: WallpaperScope[] = ["ios", "ipados", "macos"];
+const SCOPES: WallpaperScope[] = ["ios", "ipados", "macos", "material"];
 
 export const WALLPAPERS: Record<WallpaperScope, Wallpaper[]> = {
   ios: [
@@ -29,12 +31,21 @@ export const WALLPAPERS: Record<WallpaperScope, Wallpaper[]> = {
     { id: "ventura", name: "Ventura", src: "/wallpapers/macos/ventura.jpg", tone: "light" },
     { id: "bigsur", name: "Big Sur", src: "/wallpapers/macos/bigsur.jpg", tone: "light" },
   ],
+  // Android (Material You): each wallpaper seeds the dynamic-color palette. (§4.2)
+  material: [
+    { id: "petals", name: "Petals", src: "/wallpapers/androidos/petals.webp", tone: "light", seed: "#5c8a51" },
+    { id: "bloom", name: "Bloom", src: "/wallpapers/androidos/bloom.webp", tone: "light", seed: "#c06a3c" },
+    { id: "spectrum", name: "Spectrum", src: "/wallpapers/androidos/spectrum.webp", tone: "dark", seed: "#1f8f6f" },
+    { id: "mist", name: "Mist", src: "/wallpapers/androidos/mist.webp", tone: "light", seed: "#8f8147" },
+    { id: "oneui", name: "One UI", src: "/wallpapers/androidos/oneui.webp", tone: "light", seed: "#6f79a6" },
+  ],
 };
 
 export const DEFAULT_WALLPAPER: Record<WallpaperScope, string> = {
   ios: "aurora",
   ipados: "m2",
   macos: "sonoma",
+  material: "petals",
 };
 
 /** Narrow a skin to a wallpaper scope, or null if the skin has no wallpapers. */

@@ -30,10 +30,12 @@ only the chrome, motion, and materials adapt. See [`DESIGN-SYSTEM.md`](./DESIGN-
 - **Settings + appearance (all skins):** every skin has a native **Settings** destination (replaces
   Play) with a light / dark / automatic **appearance** switch — a persisted, manual theme override
   (`data-theme`) layered over `prefers-color-scheme`, applied across all skins. The **Apple** skins
-  (macOS · iPhone · iPad) also have a **wallpaper picker** backed by real image wallpapers rendered
-  behind the chrome (macOS: Sonoma · Ventura · Big Sur; iPhone: Aurora · Neon; iPad: Sequoia · Air).
-  Wallpaper choice is stored **per skin** so each device keeps its own; theme + wallpapers persist in
-  `localStorage`. (Wallpaper for Android/Windows is a follow-up.)
+  (macOS · iPhone · iPad) and **Android** also have a **wallpaper picker** backed by real image
+  wallpapers rendered behind the chrome (macOS: Sonoma · Ventura · Big Sur; iPhone: Aurora · Neon;
+  iPad: Sequoia · Air; Android: Petals · Bloom · Spectrum · Mist · One UI). On **Android**, choosing a
+  wallpaper also re-seeds **Material You dynamic color** from it — the whole palette adapts. Wallpaper
+  choice is stored **per skin** so each device keeps its own; theme + wallpapers persist in
+  `localStorage`. (Windows wallpaper is a follow-up.)
 - **Skin routing:** Apple → iOS / iPadOS / macOS by form factor; Android → Material (adapts up to
   expanded layouts); Windows → Fluent (scales down to a compact icon rail); unknown/Linux desktops
   fall back to macOS. All five skins are code-split and selectable live via the corner switcher.
