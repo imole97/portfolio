@@ -10,9 +10,11 @@ interface TopAppBarProps {
   /** The scrolling content element this bar reacts to. */
   scrollRef: React.RefObject<HTMLElement | null>;
   action?: React.ReactNode;
+  /** Optional leading control (e.g. a back button when opened as an app). */
+  leading?: React.ReactNode;
 }
 
-export function TopAppBar({ title, subtitle, scrollRef, action }: TopAppBarProps) {
+export function TopAppBar({ title, subtitle, scrollRef, action, leading }: Readonly<TopAppBarProps>) {
   const [collapsed, setCollapsed] = useState(false);
   const ticking = useRef(false);
 
@@ -41,7 +43,8 @@ export function TopAppBar({ title, subtitle, scrollRef, action }: TopAppBarProps
         paddingBottom: collapsed ? 12 : 16,
       }}
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2">
+        {leading}
         <h1
           className="font-semibold transition-all duration-300"
           style={{
@@ -51,7 +54,7 @@ export function TopAppBar({ title, subtitle, scrollRef, action }: TopAppBarProps
         >
           {title}
         </h1>
-        {action}
+        {action && <span className="ml-auto">{action}</span>}
       </div>
       {subtitle && (
         <p
@@ -61,6 +64,7 @@ export function TopAppBar({ title, subtitle, scrollRef, action }: TopAppBarProps
             maxHeight: collapsed ? 0 : 40,
             opacity: collapsed ? 0 : 1,
             marginTop: collapsed ? 0 : 4,
+            marginLeft: leading ? 44 : 0,
           }}
         >
           {subtitle}

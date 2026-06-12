@@ -19,10 +19,12 @@ only the chrome, motion, and materials adapt. See [`DESIGN-SYSTEM.md`](./DESIGN-
     safe-area insets.
   - **iPad (iPadOS):** two-pane sidebar + detail in landscape, single column with a popover sidebar
     in portrait.
-- **Android skin (Material You):** runtime **dynamic color** (seed any hue via `?seed=1B6C3A`),
-  Roboto Flex, tonal surfaces, adaptive chrome (bottom nav + FAB on mobile, navigation rail on
-  tablet/expanded), flexible top app bar that collapses on scroll, press ripples, and the
-  signature **container transform** work→detail reveal.
+- **Android skin (Material You):** a real **home-screen launcher** — status bar, an At-a-Glance
+  date widget, an app-icon grid (sections + GitHub/LinkedIn/X/Résumé launchers), page dots, and a
+  Google-style search-pill dock; tapping a section icon **opens it full-screen** (flexible top app
+  bar that collapses on scroll + a Back affordance, system Back/Esc returns home). Runtime
+  **dynamic color** (extracted from the wallpaper seed; seed any hue via `?seed=1B6C3A`), Roboto
+  Flex, tonal surfaces, press ripples, and the signature **container transform** work→detail reveal.
 - **Windows skin (Fluent / Mica):** a full **Windows 11 desktop** — wallpaper, a centered **taskbar**
   (Start button + pinned apps with running indicators + system-tray clock), and a **Start menu**
   (search, Pinned grid of sections + social/résumé launchers, Recommended, account + power). Sections

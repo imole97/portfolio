@@ -67,6 +67,37 @@ export function staggerReveal(
   );
 }
 
+/** App-open transition: the section scales up from the tapped icon (home → app). */
+export function appOpen(el: Element, opts: { reducedMotion: boolean } = { reducedMotion: false }) {
+  ensurePlugins();
+  if (opts.reducedMotion) {
+    gsap.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.18 });
+    return;
+  }
+  gsap.fromTo(
+    el,
+    { opacity: 0, scale: 0.92, transformOrigin: "50% 64%" },
+    { opacity: 1, scale: 1, duration: MD_DUR.medium, ease: MD_EASE },
+  );
+}
+
+/** Staggered home-screen icon reveal. */
+export function homeReveal(
+  targets: gsap.DOMTarget,
+  opts: { reducedMotion: boolean } = { reducedMotion: false },
+) {
+  ensurePlugins();
+  if (opts.reducedMotion) {
+    gsap.set(targets, { opacity: 1, y: 0, scale: 1 });
+    return;
+  }
+  gsap.fromTo(
+    targets,
+    { opacity: 0, y: 14, scale: 0.8 },
+    { opacity: 1, y: 0, scale: 1, duration: MD_DUR.medium, ease: "back.out(1.6)", stagger: 0.035 },
+  );
+}
+
 /** FAB entrance: scale + lift. */
 export function fabIn(el: Element, opts: { reducedMotion: boolean } = { reducedMotion: false }) {
   ensurePlugins();
