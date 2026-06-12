@@ -66,18 +66,3 @@ export function entranceSlide(
     },
   );
 }
-
-/** NavigationView pane expand/collapse — a small spring on the width. */
-export function paneToggle(
-  el: Element,
-  width: number,
-  opts: { reducedMotion: boolean } = { reducedMotion: false },
-) {
-  ensurePlugins();
-  gsap.to(el, {
-    width,
-    duration: opts.reducedMotion ? 0 : 0.3,
-    ease: "back.out(1.4)",
-    overwrite: "auto",
-  });
-}

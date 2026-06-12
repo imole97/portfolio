@@ -1,8 +1,10 @@
 "use client";
 
-// Settings — Fluent styled. Appearance only (wallpaper deferred). (§4.3)
+// Settings — Fluent styled: Appearance + Background (wallpaper). (§4.3)
 
+import Image from "next/image";
 import { useSkin, type ThemeMode } from "@/components/SkinProvider";
+import { wallpapersFor } from "@/lib/wallpapers";
 import { useReveal } from "../useReveal";
 
 const MODES: { id: ThemeMode; label: string; detail: string }[] = [
@@ -12,7 +14,7 @@ const MODES: { id: ThemeMode; label: string; detail: string }[] = [
 ];
 
 export function FluentSettings() {
-  const { theme, setTheme } = useSkin();
+  const { theme, setTheme, wallpaper, setWallpaper } = useSkin();
   return (
     <div className="max-w-2xl">
       <h3 className="mb-1 text-[15px] font-semibold">Appearance</h3>
@@ -20,11 +22,7 @@ export function FluentSettings() {
         Select which app theme to display.
       </p>
 
-      <div
-        className="fluent-card overflow-hidden"
-        role="radiogroup"
-        aria-label="App theme"
-      >
+      <div className="fluent-card overflow-hidden" role="radiogroup" aria-label="App theme">
         {MODES.map((m, i) => (
           <Option
             key={m.id}
@@ -35,6 +33,44 @@ export function FluentSettings() {
             onClick={() => setTheme(m.id)}
           />
         ))}
+      </div>
+
+      <h3 className="mb-1 mt-7 text-[15px] font-semibold">Background</h3>
+      <p className="mb-4 text-[13px]" style={{ color: "var(--fl-text-secondary)" }}>
+        Choose a picture for your desktop.
+      </p>
+
+      <div className="flex flex-wrap gap-3">
+        {wallpapersFor("fluent").map((w) => {
+          const active = w.id === wallpaper;
+          return (
+            <button
+              key={w.id}
+              onClick={() => setWallpaper(w.id)}
+              aria-pressed={active}
+              aria-label={`${w.name} background`}
+              className="text-left"
+            >
+              <span
+                className="relative block h-[4.75rem] w-32 overflow-hidden rounded-[var(--fl-radius-sm)]"
+                style={{
+                  outline: active
+                    ? "2px solid var(--fl-accent)"
+                    : "1px solid var(--fl-stroke-strong)",
+                  outlineOffset: active ? "2px" : "0",
+                }}
+              >
+                <Image src={w.src} alt="" fill sizes="128px" className="object-cover" />
+              </span>
+              <span
+                className="mt-1.5 block text-[12px] font-medium"
+                style={{ color: active ? "var(--fl-accent)" : "var(--fl-text-secondary)" }}
+              >
+                {w.name}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

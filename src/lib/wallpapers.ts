@@ -13,9 +13,9 @@ export interface Wallpaper {
 }
 
 /** Skins that have a selectable wallpaper (keyed by the skin value). */
-export type WallpaperScope = "ios" | "ipados" | "macos" | "material";
+export type WallpaperScope = "ios" | "ipados" | "macos" | "material" | "fluent";
 
-const SCOPES: WallpaperScope[] = ["ios", "ipados", "macos", "material"];
+const SCOPES: WallpaperScope[] = ["ios", "ipados", "macos", "material", "fluent"];
 
 export const WALLPAPERS: Record<WallpaperScope, Wallpaper[]> = {
   ios: [
@@ -39,6 +39,14 @@ export const WALLPAPERS: Record<WallpaperScope, Wallpaper[]> = {
     { id: "mist", name: "Mist", src: "/wallpapers/androidos/mist.webp", tone: "light", seed: "#8f8147" },
     { id: "oneui", name: "One UI", src: "/wallpapers/androidos/oneui.webp", tone: "light", seed: "#6f79a6" },
   ],
+  // Windows — a tour through Windows history + scenery. (§4.3)
+  fluent: [
+    { id: "bloom", name: "Bloom", src: "/wallpapers/win-os/bloom.jpg", tone: "dark" },
+    { id: "win7", name: "Windows 7", src: "/wallpapers/win-os/win7.jpg", tone: "light" },
+    { id: "bliss", name: "Bliss", src: "/wallpapers/win-os/bliss.jpg", tone: "light" },
+    { id: "coast", name: "Coast", src: "/wallpapers/win-os/coast.jpg", tone: "light" },
+    { id: "shore", name: "Shore", src: "/wallpapers/win-os/shore.jpg", tone: "light" },
+  ],
 };
 
 export const DEFAULT_WALLPAPER: Record<WallpaperScope, string> = {
@@ -46,6 +54,7 @@ export const DEFAULT_WALLPAPER: Record<WallpaperScope, string> = {
   ipados: "m2",
   macos: "sonoma",
   material: "petals",
+  fluent: "bloom",
 };
 
 /** Narrow a skin to a wallpaper scope, or null if the skin has no wallpapers. */

@@ -1,18 +1,19 @@
 "use client";
 
-// A draggable, resizable liquid-glass window with traffic-light controls.
-// (DESIGN-SYSTEM §4.1 macOS) Focus dimming + z-order come from the manager.
+// A draggable, resizable Windows 11 window with caption buttons. (DESIGN-SYSTEM §4.3)
+// Mica title bar; focus dimming + z-order come from the shared window manager.
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { useSkin } from "@/components/SkinProvider";
-import { liquidSettle, windowExit } from "@/lib/motion/apple";
+import { entranceSlide } from "@/lib/motion/fluent";
 import { cn } from "@/lib/cn";
-import type { SectionId } from "@/lib/content";
 import type { WindowManager, WindowState } from "@/lib/windowManager";
+import { useReveal } from "./useReveal";
 
-interface WindowProps {
+interface FluentWindowProps {
   state: WindowState;
   title: string;
+  icon: string;
   manager: WindowManager;
   focused: boolean;
   viewport: { w: number; h: number };
@@ -23,25 +24,25 @@ type DragMode =
   | { kind: "move"; startX: number; startY: number; ox: number; oy: number }
   | { kind: "resize"; startX: number; startY: number; ow: number; oh: number };
 
-export function Window({
+export function FluentWindow({
   state,
   title,
+  icon,
   manager,
   focused,
   viewport,
   children,
-}: WindowProps) {
+}: Readonly<FluentWindowProps>) {
   const { reducedMotion } = useSkin();
   const rootRef = useRef<HTMLElement>(null);
   const dragRef = useRef<DragMode | null>(null);
 
-  // Entrance — liquid settle on mount.
+  // Entrance — subtle Fluent slide-up + fade.
   useEffect(() => {
-    if (rootRef.current) liquidSettle(rootRef.current, { reducedMotion, from: "center" });
+    if (rootRef.current) entranceSlide(rootRef.current, { reducedMotion });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Pointer drag/resize handlers.
   useEffect(() => {
     function onMove(e: PointerEvent) {
       const d = dragRef.current;
@@ -70,47 +71,26 @@ export function Window({
   }, [manager, state.id]);
 
   function startMove(e: React.PointerEvent) {
-    if ((e.target as HTMLElement).closest("[data-traffic]")) return;
+    if ((e.target as HTMLElement).closest("[data-caption]")) return;
     manager.focusWindow(state.id);
-    dragRef.current = {
-      kind: "move",
-      startX: e.clientX,
-      startY: e.clientY,
-      ox: state.x,
-      oy: state.y,
-    };
+    dragRef.current = { kind: "move", startX: e.clientX, startY: e.clientY, ox: state.x, oy: state.y };
   }
 
   function startResize(e: React.PointerEvent) {
     e.stopPropagation();
     manager.focusWindow(state.id);
-    dragRef.current = {
-      kind: "resize",
-      startX: e.clientX,
-      startY: e.clientY,
-      ow: state.w,
-      oh: state.h,
-    };
-  }
-
-  function close() {
-    if (rootRef.current) {
-      windowExit(rootRef.current, { reducedMotion }).then(() => manager.closeWindow(state.id));
-    } else {
-      manager.closeWindow(state.id);
-    }
+    dragRef.current = { kind: "resize", startX: e.clientX, startY: e.clientY, ow: state.w, oh: state.h };
   }
 
   // Esc closes the focused window. (DESIGN-SYSTEM §8)
   useEffect(() => {
     if (!focused) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape") manager.closeWindow(state.id);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focused]);
+  }, [focused, manager, state.id]);
 
   if (state.minimized) return null;
 
@@ -122,9 +102,9 @@ export function Window({
       aria-modal={false}
       onPointerDown={() => manager.focusWindow(state.id)}
       className={cn(
-        "glass glass-specular absolute flex flex-col overflow-hidden rounded-[var(--radius-card)]",
-        "text-[var(--text-primary)] transition-[filter,opacity] duration-200",
-        !focused && "brightness-[0.97] saturate-[0.9]",
+        "absolute flex flex-col overflow-hidden rounded-[var(--fl-radius)]",
+        "transition-[filter,opacity] duration-200",
+        !focused && "brightness-[0.99] saturate-[0.97]",
       )}
       style={{
         left: state.x,
@@ -133,44 +113,37 @@ export function Window({
         height: state.h,
         zIndex: 100 + state.z,
         contentVisibility: "auto",
+        background: "var(--fl-card)",
+        color: "var(--fl-text)",
+        border: "1px solid var(--fl-stroke-strong)",
+        boxShadow: focused
+          ? "0 16px 48px -12px rgba(0,0,0,0.45)"
+          : "0 8px 24px -12px rgba(0,0,0,0.35)",
       }}
     >
-      {/* Title bar */}
+      {/* Mica title bar */}
       <header
         onPointerDown={startMove}
         onDoubleClick={() => manager.zoomWindow(state.id, viewport)}
-        className="relative flex h-10 shrink-0 cursor-grab items-center gap-2 px-3 active:cursor-grabbing"
-        style={{ borderBottom: "1px solid var(--separator)" }}
+        className="relative flex h-9 shrink-0 cursor-default items-center gap-2 pl-3"
+        style={{ background: "var(--fl-mica)" }}
       >
-        <div data-traffic className="flex items-center gap-2">
-          <TrafficLight color="#ff5f57" label="Close window" onClick={close} glyph="×" />
-          <TrafficLight
-            color="#febc2e"
-            label="Minimize window"
-            onClick={() => manager.toggleMinimize(state.id)}
-            glyph="–"
-          />
-          <TrafficLight
-            color="#28c840"
-            label="Zoom window"
-            onClick={() => manager.zoomWindow(state.id, viewport)}
-            glyph="+"
-          />
-        </div>
-        <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 text-[13px] font-semibold opacity-80">
+        <span aria-hidden className="text-[13px] leading-none">
+          {icon}
+        </span>
+        <span className="text-[12px] font-medium" style={{ color: "var(--fl-text-secondary)" }}>
           {title}
         </span>
-        {/* Leading-edge shimmer target for the liquid-settle entrance. */}
-        <span
-          data-shimmer
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 w-1/3"
-          style={{
-            background:
-              "linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent)",
-            opacity: 0,
-          }}
-        />
+
+        <div data-caption className="ml-auto flex items-stretch self-stretch">
+          <CaptionButton label="Minimize" glyph="‒" onClick={() => manager.toggleMinimize(state.id)} />
+          <CaptionButton
+            label="Maximize"
+            glyph="▢"
+            onClick={() => manager.zoomWindow(state.id, viewport)}
+          />
+          <CaptionButton label="Close" glyph="✕" danger onClick={() => manager.closeWindow(state.id)} />
+        </div>
       </header>
 
       {/* Content */}
@@ -180,12 +153,12 @@ export function Window({
       <button
         aria-label="Resize window"
         onPointerDown={startResize}
-        className="absolute bottom-0 right-0 h-5 w-5 cursor-nwse-resize"
+        className="absolute bottom-0 right-0 h-4 w-4 cursor-nwse-resize"
         style={{ touchAction: "none" }}
       >
         <span
           aria-hidden
-          className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-[2px] opacity-40"
+          className="absolute bottom-1 right-1 h-2 w-2 opacity-40"
           style={{ borderRight: "2px solid currentColor", borderBottom: "2px solid currentColor" }}
         />
       </button>
@@ -193,27 +166,30 @@ export function Window({
   );
 }
 
-function TrafficLight({
-  color,
+function CaptionButton({
   label,
-  onClick,
   glyph,
-}: {
-  color: string;
-  label: string;
-  onClick: () => void;
-  glyph: string;
-}) {
+  danger,
+  onClick,
+}: Readonly<{ label: string; glyph: string; danger?: boolean; onClick: () => void }>) {
+  const reveal = useReveal<HTMLButtonElement>();
   return (
     <button
+      {...reveal}
       aria-label={label}
       onClick={onClick}
-      className="group grid h-3.5 w-3.5 place-items-center rounded-full text-[9px] font-bold leading-none text-black/50"
-      style={{ background: color }}
+      className="reveal grid w-[46px] place-items-center text-[12px] transition-colors"
+      style={{ color: "var(--fl-text-secondary)" }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = danger ? "#c42b1c" : "var(--fl-subtle-hover)";
+        e.currentTarget.style.color = danger ? "#fff" : "var(--fl-text)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "transparent";
+        e.currentTarget.style.color = "var(--fl-text-secondary)";
+      }}
     >
-      <span className="opacity-0 transition-opacity group-hover:opacity-100">{glyph}</span>
+      {glyph}
     </button>
   );
 }
-
-export type { SectionId };

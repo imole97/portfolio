@@ -23,19 +23,21 @@ only the chrome, motion, and materials adapt. See [`DESIGN-SYSTEM.md`](./DESIGN-
   Roboto Flex, tonal surfaces, adaptive chrome (bottom nav + FAB on mobile, navigation rail on
   tablet/expanded), flexible top app bar that collapses on scroll, press ripples, and the
   signature **container transform** work→detail reveal.
-- **Windows skin (Fluent / Mica):** Mica app background, Acrylic search flyout, pointer-driven
-  reveal highlight, Segoe UI Variable, a Mica title bar with caption buttons, a collapsible
-  NavigationView (expanded pane ↔ icon rail), a command bar with ⌘K search, and the signature
-  **connected animation** (thumbnail flies into the detail header).
+- **Windows skin (Fluent / Mica):** a full **Windows 11 desktop** — wallpaper, a centered **taskbar**
+  (Start button + pinned apps with running indicators + system-tray clock), and a **Start menu**
+  (search, Pinned grid of sections + social/résumé launchers, Recommended, account + power). Sections
+  open as **draggable Fluent windows** with Mica title bars and minimize/maximize/close caption
+  buttons (sharing the macOS window manager), pointer-driven reveal highlights, Segoe UI Variable, and
+  the signature **connected animation** (thumbnail flies into the detail header).
 - **Settings + appearance (all skins):** every skin has a native **Settings** destination (replaces
   Play) with a light / dark / automatic **appearance** switch — a persisted, manual theme override
-  (`data-theme`) layered over `prefers-color-scheme`, applied across all skins. The **Apple** skins
-  (macOS · iPhone · iPad) and **Android** also have a **wallpaper picker** backed by real image
-  wallpapers rendered behind the chrome (macOS: Sonoma · Ventura · Big Sur; iPhone: Aurora · Neon;
-  iPad: Sequoia · Air; Android: Petals · Bloom · Spectrum · Mist · One UI). On **Android**, choosing a
-  wallpaper also re-seeds **Material You dynamic color** from it — the whole palette adapts. Wallpaper
-  choice is stored **per skin** so each device keeps its own; theme + wallpapers persist in
-  `localStorage`. (Windows wallpaper is a follow-up.)
+  (`data-theme`) layered over `prefers-color-scheme`, applied across all skins. **Every** skin also
+  has a **wallpaper picker** backed by real image wallpapers rendered behind the chrome (macOS:
+  Sonoma · Ventura · Big Sur; iPhone: Aurora · Neon; iPad: Sequoia · Air; Android: Petals · Bloom ·
+  Spectrum · Mist · One UI; Windows: Bloom · Windows 7 · Bliss · Coast · Shore — the acrylic
+  taskbar/Start menu blur it for the Mica look). On **Android**, choosing a wallpaper also re-seeds
+  **Material You dynamic color** from it — the whole palette adapts. Wallpaper choice is stored **per
+  skin** so each device keeps its own; theme + wallpapers persist in `localStorage`.
 - **Skin routing:** Apple → iOS / iPadOS / macOS by form factor; Android → Material (adapts up to
   expanded layouts); Windows → Fluent (scales down to a compact icon rail); unknown/Linux desktops
   fall back to macOS. All five skins are code-split and selectable live via the corner switcher.

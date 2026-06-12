@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { content, sectionMeta, type SectionId } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { getWallpaper } from "@/lib/wallpapers";
-import { useWindowManager } from "./windowManager";
+import { useWindowManager } from "@/lib/windowManager";
 import { Window } from "./Window";
 import { MenuBar } from "./MenuBar";
 import { Dock } from "./Dock";
