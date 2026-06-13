@@ -15,8 +15,10 @@ only the chrome, motion, and materials adapt. See [`DESIGN-SYSTEM.md`](./DESIGN-
   across three form factors.
   - **macOS desktop:** wallpaper, translucent menu bar, magnify-on-hover dock, draggable/resizable
     glass windows with traffic lights, ⌘K Spotlight.
-  - **iPhone (iOS):** single column, collapse-on-scroll large title, floating glass tab bar,
-    safe-area insets.
+  - **iPhone (iOS):** an iOS **home screen** — status bar, content-driven widgets (featured work,
+    about), an app-icon grid, a Search pill + page dots, and a frosted dock of the sections. Tapping
+    an app opens it (single column, collapse-on-scroll large title, floating glass tab bar, safe-area
+    insets) with a Home button to return.
   - **iPad (iPadOS):** an iPadOS **home screen** — status bar, content-driven widgets (live clock,
     featured work, about), an app-icon grid + page dots, a Spotlight pill, and a frosted dock. Tapping
     an app opens the portfolio app (two-pane sidebar + detail in landscape, popover sidebar in

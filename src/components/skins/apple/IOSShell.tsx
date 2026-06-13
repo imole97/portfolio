@@ -13,12 +13,14 @@ import { useBattery } from "@/lib/useBattery";
 import { BatteryGlyph } from "@/components/BatteryGlyph";
 import { TabBar } from "./TabBar";
 import { Spotlight } from "./Spotlight";
+import { IOSHome } from "./IOSHome";
 import { SECTION_COMPONENTS } from "./sections";
 
 export function IOSShell() {
   const { reducedMotion, wallpaper } = useSkin();
   const wp = getWallpaper("ios", wallpaper);
   const battery = useBattery();
+  const [home, setHome] = useState(true); // start on the iPhone home screen
   const [active, setActive] = useState<SectionId>("work");
   const [collapsed, setCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -60,6 +62,12 @@ export function IOSShell() {
     if (contentRef.current) liquidSettle(contentRef.current, { reducedMotion, from: "bottom" });
   }, [active, reducedMotion]);
 
+  // Launch a section from the home screen / Spotlight.
+  function openFromHome(id: SectionId) {
+    setActive(id);
+    setHome(false);
+  }
+
   const Section = SECTION_COMPONENTS[active];
   const title = sectionMeta[active].title;
 
@@ -78,79 +86,112 @@ export function IOSShell() {
           sizes="100vw"
           className="object-cover"
         />
-        <div
-          className="absolute inset-0"
-          style={{ background: "color-mix(in srgb, var(--bg) 55%, transparent)" }}
-        />
-      </div>
-
-      {/* Compact nav bar — battery (left, real only), small title (center, fades in once
-          the large title scrolls away), search (right). */}
-      <header
-        className="glass absolute inset-x-0 top-0 z-[200] flex items-end justify-between gap-2 px-4 pb-2"
-        style={{
-          borderRadius: 0,
-          borderBottom: collapsed ? "1px solid var(--separator)" : "1px solid transparent",
-          paddingTop: "calc(env(safe-area-inset-top) + 8px)",
-          background: collapsed ? "var(--glass-bg)" : "transparent",
-          boxShadow: "none",
-          transition: "background 200ms ease, border-color 200ms ease",
-        }}
-      >
-        <div className="flex min-w-[4rem] items-center">
-          {battery !== null && (
-            <span className="flex items-center gap-1 text-[13px] font-medium tabular-nums">
-              {battery}%
-              <BatteryGlyph level={battery} />
-            </span>
-          )}
-        </div>
-        <span
-          className="text-[17px] font-semibold transition-opacity duration-200"
-          style={{ opacity: collapsed ? 1 : 0 }}
-        >
-          {title}
-        </span>
-        <div className="flex min-w-[4rem] justify-end">
-          <button
-            onClick={() => setSearchOpen(true)}
-            aria-label="Search"
-            className="grid h-8 w-8 place-items-center rounded-full text-[15px] transition-colors hover:bg-black/5 dark:hover:bg-white/10"
-          >
-            🔍
-          </button>
-        </div>
-      </header>
-
-      <div
-        ref={scrollRef}
-        className="relative z-10 flex-1 overflow-auto overscroll-contain px-4 pb-32"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 52px)" }}
-      >
-        {/* Large title (scrolls away). */}
-        <h1 className="mb-4 text-[34px] font-bold tracking-tight">{title}</h1>
-
-        {active === "work" && (
-          <p className="mb-5 text-[15px]" style={{ color: "var(--text-secondary)" }}>
-            {content.hero.thesis}
-          </p>
+        {home ? (
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, rgba(0,0,0,0.25), transparent 14%, transparent 78%, rgba(0,0,0,0.28))",
+            }}
+          />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{ background: "color-mix(in srgb, var(--bg) 55%, transparent)" }}
+          />
         )}
-
-        <div ref={contentRef}>
-          <Section />
-        </div>
       </div>
 
-      <TabBar active={active} onSelect={setActive} />
+      {home ? (
+        <IOSHome onOpen={openFromHome} onOpenSearch={() => setSearchOpen(true)} />
+      ) : (
+        <>
+          {/* Compact nav bar — Home (left), small title (center, fades in once the large
+              title scrolls away), battery + search (right). */}
+          <header
+            className="glass absolute inset-x-0 top-0 z-[200] flex items-end justify-between gap-2 px-4 pb-2"
+            style={{
+              borderRadius: 0,
+              borderBottom: collapsed ? "1px solid var(--separator)" : "1px solid transparent",
+              paddingTop: "calc(env(safe-area-inset-top) + 8px)",
+              background: collapsed ? "var(--glass-bg)" : "transparent",
+              boxShadow: "none",
+              transition: "background 200ms ease, border-color 200ms ease",
+            }}
+          >
+            <div className="flex min-w-[5rem] items-center">
+              <button
+                onClick={() => setHome(true)}
+                aria-label="Home screen"
+                className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-black/5 dark:hover:bg-white/10"
+              >
+                <HomeGlyph />
+              </button>
+            </div>
+            <span
+              className="text-[17px] font-semibold transition-opacity duration-200"
+              style={{ opacity: collapsed ? 1 : 0 }}
+            >
+              {title}
+            </span>
+            <div className="flex min-w-[5rem] items-center justify-end gap-2">
+              {battery !== null && (
+                <span className="flex items-center gap-1 text-[13px] font-medium tabular-nums">
+                  {battery}%
+                  <BatteryGlyph level={battery} />
+                </span>
+              )}
+              <button
+                onClick={() => setSearchOpen(true)}
+                aria-label="Search"
+                className="grid h-8 w-8 place-items-center rounded-full text-[15px] transition-colors hover:bg-black/5 dark:hover:bg-white/10"
+              >
+                🔍
+              </button>
+            </div>
+          </header>
+
+          <div
+            ref={scrollRef}
+            className="relative z-10 flex-1 overflow-auto overscroll-contain px-4 pb-32"
+            style={{ paddingTop: "calc(env(safe-area-inset-top) + 52px)" }}
+          >
+            {/* Large title (scrolls away). */}
+            <h1 className="mb-4 text-[34px] font-bold tracking-tight">{title}</h1>
+
+            {active === "work" && (
+              <p className="mb-5 text-[15px]" style={{ color: "var(--text-secondary)" }}>
+                {content.hero.thesis}
+              </p>
+            )}
+
+            <div ref={contentRef}>
+              <Section />
+            </div>
+          </div>
+
+          <TabBar active={active} onSelect={setActive} />
+        </>
+      )}
 
       <Spotlight
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
         onOpenSection={(id) => {
-          setActive(id);
+          openFromHome(id);
           setSearchOpen(false);
         }}
       />
     </main>
+  );
+}
+
+function HomeGlyph() {
+  return (
+    <span aria-hidden className="grid grid-cols-2 gap-[3px]">
+      {[0, 1, 2, 3].map((i) => (
+        <span key={i} className="block h-[6px] w-[6px] rounded-[2px]" style={{ background: "currentColor" }} />
+      ))}
+    </span>
   );
 }
