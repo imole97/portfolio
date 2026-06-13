@@ -14,6 +14,7 @@ import {
   type ReactNode,
 } from "react";
 import {
+  peerSkin,
   readBrowserSignals,
   resolveSkin,
   type FormFactor,
@@ -31,6 +32,8 @@ export type ThemeMode = "system" | "light" | "dark";
 export interface SkinContextValue {
   /** Concrete skin to render. "neutral" until mounted. */
   skin: Skin;
+  /** The device's own (auto-detected) skin — the enforced default. */
+  nativeSkin: Skin;
   os: OS;
   formFactor: FormFactor;
   /** True once the client has resolved the real skin (drives the fade-in). */
@@ -75,6 +78,7 @@ function dataSkinFor(skin: Skin): string {
 
 export function SkinProvider({ children }: { children: ReactNode }) {
   const [skin, setSkin] = useState<Skin>("neutral");
+  const [nativeSkin, setNativeSkin] = useState<Skin>("neutral");
   const [os, setOS] = useState<OS>("other");
   const [formFactor, setFormFactor] = useState<FormFactor>("desktop");
   const [ready, setReady] = useState(false);
@@ -107,13 +111,27 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     const { hints, viewport } = readBrowserSignals();
     const resolved = resolveSkin(hints, viewport);
 
+    // Enforce the concept: a device may only run its own skin or its same-form-factor
+    // peer. Any other stored override (e.g. stale, or copied from another device) is
+    // ignored and cleared, falling back to the device's own skin.
+    const peer = peerSkin(resolved.skin, resolved.formFactor);
+    const allowedOverride = stored && (stored === resolved.skin || stored === peer) ? stored : null;
+    if (stored && !allowedOverride) {
+      try {
+        localStorage.removeItem(OVERRIDE_KEY);
+      } catch {
+        /* storage may be unavailable */
+      }
+    }
+
     // Hydration-safe: SSR paints the neutral skin, the real skin resolves here on
     // mount. The synchronous setState is intentional and batched in one commit.
     /* eslint-disable react-hooks/set-state-in-effect */
     setOS(resolved.os);
     setFormFactor(resolved.formFactor);
-    setOverride(stored);
-    setSkin(stored ?? resolved.skin);
+    setNativeSkin(resolved.skin);
+    setOverride(allowedOverride);
+    setSkin(allowedOverride ?? resolved.skin);
     if (storedTheme) setThemeState(storedTheme);
     setWallpapers(storedWallpapers);
     setReady(true);
@@ -152,6 +170,7 @@ export function SkinProvider({ children }: { children: ReactNode }) {
       const { hints, viewport } = readBrowserSignals();
       const resolved = resolveSkin(hints, viewport);
       setFormFactor(resolved.formFactor);
+      setNativeSkin(resolved.skin);
       setSkin(resolved.skin);
     };
     window.addEventListener("resize", onResize);
@@ -164,19 +183,20 @@ export function SkinProvider({ children }: { children: ReactNode }) {
   }, [skin]);
 
   const setSkinOverride = (next: Skin | null) => {
+    // Enforce the concept: only the device's own skin or its same-form-factor peer is
+    // selectable. Anything else is rejected.
+    const peer = peerSkin(nativeSkin, formFactor);
+    if (next && next !== nativeSkin && next !== peer) return;
+    // Choosing the device's own skin is just the default — store no override.
+    const value = next === nativeSkin ? null : next;
     try {
-      if (next) localStorage.setItem(OVERRIDE_KEY, next);
+      if (value) localStorage.setItem(OVERRIDE_KEY, value);
       else localStorage.removeItem(OVERRIDE_KEY);
     } catch {
       /* storage may be unavailable; in-memory state still updates */
     }
-    setOverride(next);
-    if (next) {
-      setSkin(next);
-    } else {
-      const { hints, viewport } = readBrowserSignals();
-      setSkin(resolveSkin(hints, viewport).skin);
-    }
+    setOverride(value);
+    setSkin(value ?? nativeSkin);
   };
 
   const setTheme = (next: ThemeMode) => {
@@ -211,6 +231,7 @@ export function SkinProvider({ children }: { children: ReactNode }) {
   const value = useMemo<SkinContextValue>(
     () => ({
       skin,
+      nativeSkin,
       os,
       formFactor,
       ready,
@@ -225,6 +246,7 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     }),
     [
       skin,
+      nativeSkin,
       os,
       formFactor,
       ready,

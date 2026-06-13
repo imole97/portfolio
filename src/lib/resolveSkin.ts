@@ -113,6 +113,47 @@ export function resolveSkinFromParts(os: OS, formFactor: FormFactor): Skin {
   return formFactor === "desktop" ? "fluent" : "material";
 }
 
+/**
+ * The single cross-platform skin a device is allowed to switch to — its same-form-factor
+ * peer. Phones swap iOS↔Android, tablets swap iPadOS↔Android, desktops swap macOS↔Windows.
+ * (The portfolio's concept: every device shows its own skin; you may only preview the
+ * "other side" at the same form factor.) Returns null when there is no peer.
+ */
+export function peerSkin(nativeSkin: Skin, formFactor: FormFactor): Skin | null {
+  switch (nativeSkin) {
+    case "ios":
+      return "material";
+    case "ipados":
+      return "material";
+    case "macos":
+      return "fluent";
+    case "fluent":
+      return "macos";
+    case "material":
+      return formFactor === "tablet" ? "ipados" : "ios";
+    default:
+      return null;
+  }
+}
+
+/** Human label for the real device a skin is meant to be viewed on. */
+export function skinDevice(skin: Skin): string {
+  switch (skin) {
+    case "macos":
+      return "a Mac";
+    case "ios":
+      return "an iPhone";
+    case "ipados":
+      return "an iPad";
+    case "material":
+      return "an Android device";
+    case "fluent":
+      return "a Windows PC";
+    default:
+      return "another device";
+  }
+}
+
 export function resolveSkin(hints: UAHints, viewport: Viewport): Resolution {
   const os = detectOS(hints);
   const formFactor = detectFormFactor(viewport, hints);

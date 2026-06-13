@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { detectFormFactor, detectOS, resolveSkin } from "./resolveSkin";
+import { detectFormFactor, detectOS, peerSkin, resolveSkin } from "./resolveSkin";
 
 const UA = {
   mac: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15",
@@ -99,5 +99,26 @@ describe("resolveSkin — by real OS, Apple split by device", () => {
     const r = resolveSkin({ ua: UA.androidPhone }, { width: 412 });
     expect(r.os).toBe("android");
     expect(r.formFactor).toBe("mobile");
+  });
+});
+
+describe("peerSkin — the one cross-platform skin a device may preview", () => {
+  it("pairs phones iOS <-> Android", () => {
+    expect(peerSkin("ios", "mobile")).toBe("material");
+    expect(peerSkin("material", "mobile")).toBe("ios");
+  });
+
+  it("pairs tablets iPadOS <-> Android", () => {
+    expect(peerSkin("ipados", "tablet")).toBe("material");
+    expect(peerSkin("material", "tablet")).toBe("ipados");
+  });
+
+  it("pairs desktops macOS <-> Windows", () => {
+    expect(peerSkin("macos", "desktop")).toBe("fluent");
+    expect(peerSkin("fluent", "desktop")).toBe("macos");
+  });
+
+  it("has no peer for the neutral skin", () => {
+    expect(peerSkin("neutral", "desktop")).toBeNull();
   });
 });
