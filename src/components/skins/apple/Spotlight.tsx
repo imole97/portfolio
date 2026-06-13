@@ -4,16 +4,10 @@
 // Keyboard-first: ↑/↓ to move, Enter to open, Esc to close. Focus is trapped.
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { content, sectionMeta, type SectionId } from "@/lib/content";
+import { type SectionId } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { liquidSettle } from "@/lib/motion/apple";
-
-interface Result {
-  id: string;
-  label: string;
-  hint: string;
-  section: SectionId;
-}
+import { buildSearchIndex, searchPortfolio, type SearchItem } from "@/lib/search";
 
 interface SpotlightProps {
   open: boolean;
@@ -21,34 +15,17 @@ interface SpotlightProps {
   onOpenSection: (id: SectionId) => void;
 }
 
-function buildIndex(): Result[] {
-  const items: Result[] = [];
-  (Object.keys(sectionMeta) as SectionId[]).forEach((id) => {
-    items.push({
-      id: `section-${id}`,
-      label: sectionMeta[id].title,
-      hint: "Section",
-      section: id,
-    });
-  });
-  content.work.forEach((w) =>
-    items.push({ id: `work-${w.slug}`, label: w.title, hint: "Case study", section: "work" }),
-  );
-  return items;
-}
-
 export function Spotlight({ open, onClose, onOpenSection }: SpotlightProps) {
   const { reducedMotion } = useSkin();
-  const index = useMemo(() => buildIndex(), []);
+  const index = useMemo(() => buildSearchIndex(), []);
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
   const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return index.slice(0, 6);
-    return index.filter((r) => r.label.toLowerCase().includes(q)).slice(0, 8);
+    if (!query.trim()) return index.slice(0, 6);
+    return searchPortfolio(index, query, 8);
   }, [index, query]);
 
   useEffect(() => {
@@ -68,8 +45,13 @@ export function Spotlight({ open, onClose, onOpenSection }: SpotlightProps) {
 
   if (!open) return null;
 
-  function choose(r: Result | undefined) {
+  function choose(r: SearchItem | undefined) {
     if (!r) return;
+    if (r.href) {
+      window.open(r.href, r.href.startsWith("http") ? "_blank" : "_self");
+      onClose();
+      return;
+    }
     onOpenSection(r.section);
     onClose();
   }
@@ -114,7 +96,7 @@ export function Spotlight({ open, onClose, onOpenSection }: SpotlightProps) {
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search work, sections, experiments…"
+            placeholder="Search work, skills, tools, contact…"
             aria-label="Search"
             className="w-full bg-transparent text-[17px] outline-none placeholder:text-[var(--text-secondary)]"
           />
@@ -131,12 +113,13 @@ export function Spotlight({ open, onClose, onOpenSection }: SpotlightProps) {
               <button
                 onMouseEnter={() => setCursor(i)}
                 onClick={() => choose(r)}
-                className="flex w-full items-center justify-between gap-3 rounded-[12px] px-3 py-2.5 text-left"
+                className="flex w-full items-center gap-3 rounded-[12px] px-3 py-2.5 text-left"
                 style={{ background: i === activeCursor ? "var(--accent)" : "transparent" }}
               >
+                <span aria-hidden className="text-[16px] leading-none">{r.glyph}</span>
                 <span className={i === activeCursor ? "font-medium text-white" : ""}>{r.label}</span>
                 <span
-                  className="text-[12px]"
+                  className="ml-auto text-[12px]"
                   style={{ color: i === activeCursor ? "rgba(255,255,255,0.8)" : "var(--text-secondary)" }}
                 >
                   {r.hint}

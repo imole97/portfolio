@@ -7,19 +7,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { content, sectionMeta, type SectionId } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { entranceSlide } from "@/lib/motion/fluent";
+import { buildSearchIndex, searchPortfolio, type SearchItem } from "@/lib/search";
 import { useReveal } from "./useReveal";
 
 interface Launcher {
   label: string;
   icon: string;
   href: string;
-}
-
-interface SearchResult {
-  id: string;
-  label: string;
-  hint: string;
-  section: SectionId;
 }
 
 const LAUNCHER_ICONS: Record<string, string> = {
@@ -38,17 +32,6 @@ function buildLaunchers(): Launcher[] {
   return [...links, { label: "Résumé", icon: "📄", href: content.contact.resumeHref }];
 }
 
-function buildSearchIndex(): SearchResult[] {
-  const items: SearchResult[] = [];
-  (Object.keys(sectionMeta) as SectionId[]).forEach((id) =>
-    items.push({ id: `s-${id}`, label: sectionMeta[id].title, hint: "Section", section: id }),
-  );
-  content.work.forEach((w) =>
-    items.push({ id: `w-${w.slug}`, label: w.title, hint: "Case study", section: "work" }),
-  );
-  return items;
-}
-
 interface StartMenuProps {
   onClose: () => void;
   onOpenSection: (id: SectionId) => void;
@@ -61,11 +44,7 @@ export function StartMenu({ onClose, onOpenSection }: Readonly<StartMenuProps>) 
   const [query, setQuery] = useState("");
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return index.filter((r) => r.label.toLowerCase().includes(q)).slice(0, 7);
-  }, [index, query]);
+  const results = useMemo(() => searchPortfolio(index, query, 7), [index, query]);
 
   useEffect(() => {
     if (panelRef.current) entranceSlide(panelRef.current, { reducedMotion });
@@ -82,6 +61,15 @@ export function StartMenu({ onClose, onOpenSection }: Readonly<StartMenuProps>) 
   function openSection(id: SectionId) {
     onOpenSection(id);
     onClose();
+  }
+
+  function chooseResult(r: SearchItem) {
+    if (r.href) {
+      window.open(r.href, r.href.startsWith("http") ? "_blank" : "_self");
+      onClose();
+      return;
+    }
+    openSection(r.section);
   }
 
   return (
@@ -117,11 +105,12 @@ export function StartMenu({ onClose, onOpenSection }: Readonly<StartMenuProps>) 
             {results.map((r) => (
               <li key={r.id}>
                 <button
-                  onClick={() => openSection(r.section)}
-                  className="flex w-full items-center justify-between gap-3 rounded-[var(--fl-radius-sm)] px-3 py-2 text-left text-[14px] transition-colors hover:bg-[var(--fl-subtle-hover)]"
+                  onClick={() => chooseResult(r)}
+                  className="flex w-full items-center gap-3 rounded-[var(--fl-radius-sm)] px-3 py-2 text-left text-[14px] transition-colors hover:bg-[var(--fl-subtle-hover)]"
                 >
+                  <span aria-hidden className="text-[16px] leading-none">{r.glyph}</span>
                   <span>{r.label}</span>
-                  <span className="text-[12px]" style={{ color: "var(--fl-text-secondary)" }}>
+                  <span className="ml-auto text-[12px]" style={{ color: "var(--fl-text-secondary)" }}>
                     {r.hint}
                   </span>
                 </button>

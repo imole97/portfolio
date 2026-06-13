@@ -17,8 +17,10 @@ only the chrome, motion, and materials adapt. See [`DESIGN-SYSTEM.md`](./DESIGN-
     glass windows with traffic lights, ⌘K Spotlight.
   - **iPhone (iOS):** single column, collapse-on-scroll large title, floating glass tab bar,
     safe-area insets.
-  - **iPad (iPadOS):** two-pane sidebar + detail in landscape, single column with a popover sidebar
-    in portrait.
+  - **iPad (iPadOS):** an iPadOS **home screen** — status bar, content-driven widgets (live clock,
+    featured work, about), an app-icon grid + page dots, a Spotlight pill, and a frosted dock. Tapping
+    an app opens the portfolio app (two-pane sidebar + detail in landscape, popover sidebar in
+    portrait) with a Home button to return.
 - **Android skin (Material You):** a real **home-screen launcher** — status bar, an At-a-Glance
   date widget, an app-icon grid (sections + GitHub/LinkedIn/X/Résumé launchers), page dots, and a
   Google-style search-pill dock; tapping a section icon **opens it full-screen** (flexible top app
@@ -40,6 +42,12 @@ only the chrome, motion, and materials adapt. See [`DESIGN-SYSTEM.md`](./DESIGN-
   taskbar/Start menu blur it for the Mica look). On **Android**, choosing a wallpaper also re-seeds
   **Material You dynamic color** from it — the whole palette adapts. Wallpaper choice is stored **per
   skin** so each device keeps its own; theme + wallpapers persist in `localStorage`.
+- **Search + battery (all skins):** one shared **search index** (`src/lib/search.ts`) lets recruiters
+  find any content — sections, every case study, each skill/tool, and contact links/résumé — surfaced
+  through each skin's native search: macOS **Spotlight** (⌘K), the Windows **Start menu**, iOS/iPadOS
+  search (⌘K or the nav search button), and the Android search dock. Each skin's status/menu/tray bar
+  also shows a **real battery level** via the Battery Status API (`useBattery`), rendering nothing
+  where the browser doesn't expose one rather than faking it.
 - **Skin routing:** Apple → iOS / iPadOS / macOS by form factor; Android → Material (adapts up to
   expanded layouts); Windows → Fluent (scales down to a compact icon rail); unknown/Linux desktops
   fall back to macOS. All five skins are code-split and selectable live via the corner switcher.

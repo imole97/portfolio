@@ -4,14 +4,17 @@
 
 import { useEffect, useState } from "react";
 import { content, sectionMeta, type SectionId } from "@/lib/content";
+import { useBattery } from "@/lib/useBattery";
+import { BatteryGlyph } from "@/components/BatteryGlyph";
 
 interface MenuBarProps {
   focusedId: SectionId | null;
   onOpenSpotlight: () => void;
 }
 
-export function MenuBar({ focusedId, onOpenSpotlight }: MenuBarProps) {
+export function MenuBar({ focusedId, onOpenSpotlight }: Readonly<MenuBarProps>) {
   const clock = useClock();
+  const battery = useBattery();
   const appName = focusedId ? sectionMeta[focusedId].label : "Finder";
 
   return (
@@ -39,6 +42,12 @@ export function MenuBar({ focusedId, onOpenSpotlight }: MenuBarProps) {
             ⌘K
           </kbd>
         </button>
+        {battery !== null && (
+          <span className="flex items-center gap-1 tabular-nums opacity-80">
+            {battery}%
+            <BatteryGlyph level={battery} />
+          </span>
+        )}
         <time className="tabular-nums opacity-80" suppressHydrationWarning>
           {clock}
         </time>

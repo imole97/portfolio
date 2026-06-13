@@ -5,6 +5,8 @@
 
 import { useEffect, useState } from "react";
 import { sectionMeta, type SectionId } from "@/lib/content";
+import { useBattery } from "@/lib/useBattery";
+import { BatteryGlyph } from "@/components/BatteryGlyph";
 import { useReveal } from "./useReveal";
 
 const PINNED: SectionId[] = ["work", "about", "settings", "contact"];
@@ -25,6 +27,7 @@ export function Taskbar({
   openIds,
 }: Readonly<TaskbarProps>) {
   const { time, date } = useClock();
+  const battery = useBattery();
 
   return (
     <div
@@ -64,6 +67,12 @@ export function Taskbar({
           <span>📶</span>
           <span>🔊</span>
         </span>
+        {battery !== null && (
+          <span className="flex items-center gap-1 tabular-nums opacity-80">
+            {battery}%
+            <BatteryGlyph level={battery} />
+          </span>
+        )}
         <div className="text-right leading-tight" aria-label={`${time} ${date}`}>
           <div className="tabular-nums" suppressHydrationWarning>{time}</div>
           <div className="tabular-nums" suppressHydrationWarning>{date}</div>

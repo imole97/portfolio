@@ -1,13 +1,16 @@
 "use client";
 
-// Android home-screen launcher — status bar, At-a-Glance widget, an app-icon grid
-// (sections + link launchers), page dots, and a Google-style search pill. Blends the
-// most recognizable Pixel + One UI cues into one cohesive home screen. (§4.2)
+// Android home-screen launcher — a name/role header, an app-icon grid (sections + link
+// launchers), and a working search dock. Fake phone chrome (clock, signal, page dots) is
+// intentionally omitted; the only status shown is a *real* battery level when the device
+// exposes one (Battery Status API). (§4.2)
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { content, sectionMeta, type SectionId } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { homeReveal } from "@/lib/motion/material";
+import { useBattery } from "@/lib/useBattery";
+import { BatteryGlyph } from "@/components/BatteryGlyph";
 import { useRipple } from "./useRipple";
 
 const SECTIONS: SectionId[] = ["work", "about", "settings", "contact"];
@@ -52,24 +55,14 @@ function buildLaunchers(): Launcher[] {
   return links;
 }
 
-function useClock() {
-  // The skin is client-only (loaded with ssr: false), so seeding from the initializer
-  // is hydration-safe; the interval keeps it ticking.
-  const [now, setNow] = useState<Date>(() => new Date());
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 30_000);
-    return () => clearInterval(id);
-  }, []);
-  return now;
-}
-
 interface MaterialHomeProps {
   onOpen: (id: SectionId) => void;
+  onOpenSearch: () => void;
 }
 
-export function MaterialHome({ onOpen }: Readonly<MaterialHomeProps>) {
+export function MaterialHome({ onOpen, onOpenSearch }: Readonly<MaterialHomeProps>) {
   const { reducedMotion } = useSkin();
-  const now = useClock();
+  const battery = useBattery();
   const gridRef = useRef<HTMLDivElement>(null);
   const launchers = buildLaunchers();
 
@@ -77,10 +70,6 @@ export function MaterialHome({ onOpen }: Readonly<MaterialHomeProps>) {
     const grid = gridRef.current;
     if (grid) homeReveal(Array.from(grid.querySelectorAll<HTMLElement>("[data-icon]")), { reducedMotion });
   }, [reducedMotion]);
-
-  const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
-  const day = now.toLocaleDateString([], { weekday: "long" });
-  const date = now.toLocaleDateString([], { month: "short", day: "numeric" });
 
   const openLink = (href: string) =>
     window.open(href, href.startsWith("http") ? "_blank" : "_self");
@@ -90,29 +79,25 @@ export function MaterialHome({ onOpen }: Readonly<MaterialHomeProps>) {
       className="relative z-10 flex h-full w-full flex-col text-white"
       style={{ textShadow: "0 1px 12px rgba(0,0,0,0.4)" }}
     >
-      {/* Status bar */}
-      <div className="flex items-center justify-between px-5 pt-3 text-[13px] font-medium tabular-nums">
-        <span>{time}</span>
-        <span className="flex items-center gap-1.5">
-          <span className="text-[11px] font-semibold">5G</span>
-          <WifiIcon />
-          <BatteryIcon />
-        </span>
+      {/* Status row — reserves space; shows only a real battery level when available. */}
+      <div className="flex h-7 items-center justify-end px-5 pt-2 text-[13px] font-medium tabular-nums">
+        {battery !== null && (
+          <span className="flex items-center gap-1.5">
+            <span>{battery}%</span>
+            <BatteryGlyph level={battery} />
+          </span>
+        )}
       </div>
 
-      {/* At a Glance — date + a light weather line, top-left like Pixel. */}
+      {/* Identity widget — name + role in the At-a-Glance position. */}
       <div className="px-6 pt-6">
-        <p className="text-[26px] font-medium leading-tight">
-          {day}
-          <span className="opacity-80">, {date}</span>
-        </p>
-        <p className="mt-1 text-[14px] opacity-90">🌤️ {content.hero.role}</p>
+        <p className="text-[26px] font-semibold leading-tight">{content.hero.name}</p>
+        <p className="mt-1 text-[14px] opacity-90">{content.hero.role}</p>
       </div>
 
       {/* Apps live in the lower portion, above the dock. */}
-      <div className="flex flex-1 flex-col justify-end pb-4">
+      <div className="flex flex-1 flex-col justify-end pb-5">
         <div ref={gridRef} className="mx-auto w-full max-w-md px-5">
-          {/* Sections */}
           <div className="grid grid-cols-4 gap-x-3 gap-y-5">
             {SECTIONS.map((id) => (
               <AppIcon
@@ -124,7 +109,6 @@ export function MaterialHome({ onOpen }: Readonly<MaterialHomeProps>) {
                 onClick={() => onOpen(id)}
               />
             ))}
-            {/* Launchers */}
             {launchers.map((l) => (
               <AppIcon
                 key={l.label}
@@ -136,31 +120,22 @@ export function MaterialHome({ onOpen }: Readonly<MaterialHomeProps>) {
               />
             ))}
           </div>
-
-          {/* Page indicator */}
-          <div className="mt-6 flex items-center justify-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-white" />
-            <span className="h-1.5 w-1.5 rounded-full bg-white/45" />
-            <span className="h-1.5 w-1.5 rounded-full bg-white/45" />
-          </div>
         </div>
       </div>
 
-      {/* Dock — Google-style search pill (presentational). */}
+      {/* Dock — a working search entry point. */}
       <div className="mx-auto w-full max-w-md px-5 pb-3">
-        <div
-          role="search"
-          aria-label="Search"
-          className="flex items-center gap-3 rounded-[var(--md-radius-full)] px-5 py-3.5 shadow-lg"
+        <button
+          onClick={onOpenSearch}
+          aria-label="Search the portfolio"
+          className="flex w-full items-center gap-3 rounded-[var(--md-radius-full)] px-5 py-3.5 shadow-lg"
           style={{ background: "var(--md-surface)", color: "var(--md-on-surface)", textShadow: "none" }}
         >
-          <GoogleG />
-          <span className="flex-1 text-[15px]" style={{ color: "var(--md-on-surface-variant)" }}>
-            Search
+          <SearchIcon />
+          <span className="text-[15px]" style={{ color: "var(--md-on-surface-variant)" }}>
+            Search the portfolio
           </span>
-          <span aria-hidden className="text-[17px] opacity-80">🎤</span>
-          <span aria-hidden className="text-[17px] opacity-80">📷</span>
-        </div>
+        </button>
       </div>
 
       {/* Gesture pill */}
@@ -205,31 +180,11 @@ function AppIcon({
   );
 }
 
-function WifiIcon() {
+function SearchIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 18.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0-5.2c1.9 0 3.6.7 4.9 2l-1.7 1.7a4.5 4.5 0 0 0-6.4 0L7.1 15.3a6.9 6.9 0 0 1 4.9-2Zm0-4.8c3.2 0 6.1 1.3 8.2 3.4l-1.7 1.7a9.2 9.2 0 0 0-13 0L3.8 11.9A11.6 11.6 0 0 1 12 8.5Z" />
-    </svg>
-  );
-}
-
-function BatteryIcon() {
-  return (
-    <svg width="22" height="14" viewBox="0 0 26 14" fill="none" aria-hidden>
-      <rect x="1" y="1.5" width="22" height="11" rx="3" stroke="currentColor" strokeWidth="1.4" />
-      <rect x="3" y="3.5" width="16" height="7" rx="1.5" fill="currentColor" />
-      <rect x="24" y="5" width="2" height="4" rx="1" fill="currentColor" />
-    </svg>
-  );
-}
-
-function GoogleG() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
-      <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8Z" />
-      <path fill="#34A853" d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3c-1 .7-2.4 1.1-4 1.1-3 0-5.6-2-6.5-4.8H1.5v3.1A12 12 0 0 0 12 24Z" />
-      <path fill="#FBBC05" d="M5.5 14.4a7.2 7.2 0 0 1 0-4.8V6.5H1.5a12 12 0 0 0 0 10.9l4-3Z" />
-      <path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.8l3.4-3.4A12 12 0 0 0 1.5 6.5l4 3.1C6.4 6.8 9 4.8 12 4.8Z" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden style={{ color: "var(--md-on-surface-variant)" }}>
+      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+      <path d="m20 20-3.2-3.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

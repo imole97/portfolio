@@ -9,17 +9,34 @@ import { content, sectionMeta, type SectionId } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { liquidSettle } from "@/lib/motion/apple";
 import { getWallpaper } from "@/lib/wallpapers";
+import { useBattery } from "@/lib/useBattery";
+import { BatteryGlyph } from "@/components/BatteryGlyph";
 import { TabBar } from "./TabBar";
+import { Spotlight } from "./Spotlight";
 import { SECTION_COMPONENTS } from "./sections";
 
 export function IOSShell() {
   const { reducedMotion, wallpaper } = useSkin();
   const wp = getWallpaper("ios", wallpaper);
+  const battery = useBattery();
   const [active, setActive] = useState<SectionId>("work");
   const [collapsed, setCollapsed] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const ticking = useRef(false);
+
+  // ⌘K / Ctrl+K opens Spotlight search.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen((v) => !v);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   // iOS large-title collapse tied to scroll. (§4.1 Motion)
   useEffect(() => {
@@ -67,9 +84,10 @@ export function IOSShell() {
         />
       </div>
 
-      {/* Compact nav bar — small title fades in once the large title scrolls away. */}
+      {/* Compact nav bar — battery (left, real only), small title (center, fades in once
+          the large title scrolls away), search (right). */}
       <header
-        className="glass absolute inset-x-0 top-0 z-[200] flex items-end justify-center pb-2"
+        className="glass absolute inset-x-0 top-0 z-[200] flex items-end justify-between gap-2 px-4 pb-2"
         style={{
           borderRadius: 0,
           borderBottom: collapsed ? "1px solid var(--separator)" : "1px solid transparent",
@@ -79,12 +97,29 @@ export function IOSShell() {
           transition: "background 200ms ease, border-color 200ms ease",
         }}
       >
+        <div className="flex min-w-[4rem] items-center">
+          {battery !== null && (
+            <span className="flex items-center gap-1 text-[13px] font-medium tabular-nums">
+              {battery}%
+              <BatteryGlyph level={battery} />
+            </span>
+          )}
+        </div>
         <span
           className="text-[17px] font-semibold transition-opacity duration-200"
           style={{ opacity: collapsed ? 1 : 0 }}
         >
           {title}
         </span>
+        <div className="flex min-w-[4rem] justify-end">
+          <button
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search"
+            className="grid h-8 w-8 place-items-center rounded-full text-[15px] transition-colors hover:bg-black/5 dark:hover:bg-white/10"
+          >
+            🔍
+          </button>
+        </div>
       </header>
 
       <div
@@ -107,6 +142,15 @@ export function IOSShell() {
       </div>
 
       <TabBar active={active} onSelect={setActive} />
+
+      <Spotlight
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onOpenSection={(id) => {
+          setActive(id);
+          setSearchOpen(false);
+        }}
+      />
     </main>
   );
 }

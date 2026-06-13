@@ -12,6 +12,7 @@ import { DEFAULT_SEED, genRoles, readSeedParam } from "@/lib/material/color";
 import { getWallpaper } from "@/lib/wallpapers";
 import { MaterialHome } from "./MaterialHome";
 import { MaterialApp } from "./MaterialApp";
+import { MaterialSearch } from "./MaterialSearch";
 
 export function MaterialShell() {
   const { resolvedTheme, wallpaper } = useSkin();
@@ -23,8 +24,14 @@ export function MaterialShell() {
   const seed = seedParam ?? wp.seed ?? DEFAULT_SEED;
   // null = home screen; a section id = that app opened full-screen.
   const [open, setOpen] = useState<SectionId | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const roleVars = useMemo(() => genRoles(seed, dark), [seed, dark]);
+
+  const openSection = (id: SectionId) => {
+    setSearchOpen(false);
+    setOpen(id);
+  };
 
   return (
     <div
@@ -53,10 +60,12 @@ export function MaterialShell() {
       </div>
 
       {open ? (
-        <MaterialApp section={open} onBack={() => setOpen(null)} onOpen={setOpen} />
+        <MaterialApp section={open} onBack={() => setOpen(null)} onOpen={openSection} />
       ) : (
-        <MaterialHome onOpen={setOpen} />
+        <MaterialHome onOpen={openSection} onOpenSearch={() => setSearchOpen(true)} />
       )}
+
+      {searchOpen && <MaterialSearch onClose={() => setSearchOpen(false)} onOpen={openSection} />}
     </div>
   );
 }
