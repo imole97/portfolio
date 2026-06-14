@@ -78,11 +78,12 @@ export function Spotlight({ open, onClose, onOpenSection }: SpotlightProps) {
       role="dialog"
       aria-modal="true"
       aria-label="Spotlight search"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
     >
-      <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" aria-hidden />
+      <button
+        aria-label="Close search"
+        className="absolute inset-0 cursor-default bg-black/10 backdrop-blur-[2px]"
+        onClick={onClose}
+      />
       <div
         ref={panelRef}
         className="glass glass-specular relative w-full max-w-xl overflow-hidden rounded-[var(--radius-sheet)]"

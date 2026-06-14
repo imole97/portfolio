@@ -22,7 +22,7 @@ export function Dock({ onOpen, openIds }: DockProps) {
 
   useEffect(() => {
     const items = itemRefs.current.filter(Boolean) as HTMLElement[];
-    magnifier.current = createDockMagnifier(items, { reducedMotion });
+    magnifier.current = createDockMagnifier(items, { reducedMotion, maxScale: 1.18, radius: 80 });
     return () => magnifier.current?.reset();
   }, [reducedMotion]);
 
