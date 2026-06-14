@@ -27,6 +27,10 @@ const OVERRIDE_KEY = "portfolio:skin-override";
 const THEME_KEY = "portfolio:theme";
 const WALLPAPER_KEY = "portfolio:wallpapers";
 
+// In production the concept is enforced: a device may only run its own skin or its
+// same-form-factor peer. In development every skin is freely switchable for building.
+const ALLOW_ALL_SKINS = process.env.NODE_ENV !== "production";
+
 export type ThemeMode = "system" | "light" | "dark";
 
 export interface SkinContextValue {
@@ -115,7 +119,8 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     // peer. Any other stored override (e.g. stale, or copied from another device) is
     // ignored and cleared, falling back to the device's own skin.
     const peer = peerSkin(resolved.skin, resolved.formFactor);
-    const allowedOverride = stored && (stored === resolved.skin || stored === peer) ? stored : null;
+    const allowedOverride =
+      stored && (ALLOW_ALL_SKINS || stored === resolved.skin || stored === peer) ? stored : null;
     if (stored && !allowedOverride) {
       try {
         localStorage.removeItem(OVERRIDE_KEY);
@@ -182,22 +187,25 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     document.documentElement.dataset.skin = dataSkinFor(skin);
   }, [skin]);
 
-  const setSkinOverride = (next: Skin | null) => {
-    // Enforce the concept: only the device's own skin or its same-form-factor peer is
-    // selectable. Anything else is rejected.
-    const peer = peerSkin(nativeSkin, formFactor);
-    if (next && next !== nativeSkin && next !== peer) return;
-    // Choosing the device's own skin is just the default — store no override.
-    const value = next === nativeSkin ? null : next;
-    try {
-      if (value) localStorage.setItem(OVERRIDE_KEY, value);
-      else localStorage.removeItem(OVERRIDE_KEY);
-    } catch {
-      /* storage may be unavailable; in-memory state still updates */
-    }
-    setOverride(value);
-    setSkin(value ?? nativeSkin);
-  };
+  const setSkinOverride = useCallback(
+    (next: Skin | null) => {
+      // Enforce the concept (production only): only the device's own skin or its
+      // same-form-factor peer is selectable. Anything else is rejected.
+      const peer = peerSkin(nativeSkin, formFactor);
+      if (!ALLOW_ALL_SKINS && next && next !== nativeSkin && next !== peer) return;
+      // Choosing the device's own skin is just the default — store no override.
+      const value = next === nativeSkin ? null : next;
+      try {
+        if (value) localStorage.setItem(OVERRIDE_KEY, value);
+        else localStorage.removeItem(OVERRIDE_KEY);
+      } catch {
+        /* storage may be unavailable; in-memory state still updates */
+      }
+      setOverride(value);
+      setSkin(value ?? nativeSkin);
+    },
+    [nativeSkin, formFactor],
+  );
 
   const setTheme = (next: ThemeMode) => {
     try {
@@ -251,6 +259,7 @@ export function SkinProvider({ children }: { children: ReactNode }) {
       formFactor,
       ready,
       reducedMotion,
+      setSkinOverride,
       override,
       theme,
       resolvedTheme,

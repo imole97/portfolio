@@ -19,6 +19,10 @@ const OPTIONS: { skin: Skin; label: string }[] = [
   { skin: "fluent", label: "Windows · Fluent" },
 ];
 
+// Production enforces the concept (own skin + peer only); development unlocks every skin
+// so the whole thing is buildable from one machine.
+const ALLOW_ALL_SKINS = process.env.NODE_ENV !== "production";
+
 export function SkinSwitcher() {
   const { skin, nativeSkin, formFactor, ready, setSkinOverride } = useSkin();
   const [open, setOpen] = useState(false);
@@ -40,12 +44,13 @@ export function SkinSwitcher() {
           className="glass mb-2 w-72 overflow-hidden rounded-2xl p-1.5"
         >
           <p className="px-3 pb-1 pt-1.5 text-[11px] opacity-60">
-            This portfolio wears each device&apos;s own skin. You can preview its counterpart;
-            other skins open on their real device.
+            {ALLOW_ALL_SKINS
+              ? "Dev mode — every skin is unlocked for building."
+              : "This portfolio wears each device's own skin. You can preview its counterpart; other skins open on their real device."}
           </p>
           {OPTIONS.map((opt) => {
             const active = skin === opt.skin;
-            const allowed = opt.skin === nativeSkin || opt.skin === peer;
+            const allowed = ALLOW_ALL_SKINS || opt.skin === nativeSkin || opt.skin === peer;
             return (
               <button
                 key={opt.skin}

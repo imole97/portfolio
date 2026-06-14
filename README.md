@@ -50,9 +50,15 @@ only the chrome, motion, and materials adapt. See [`DESIGN-SYSTEM.md`](./DESIGN-
   search (⌘K or the nav search button), and the Android search dock. Each skin's status/menu/tray bar
   also shows a **real battery level** via the Battery Status API (`useBattery`), rendering nothing
   where the browser doesn't expose one rather than faking it.
-- **Skin routing:** Apple → iOS / iPadOS / macOS by form factor; Android → Material (adapts up to
-  expanded layouts); Windows → Fluent (scales down to a compact icon rail); unknown/Linux desktops
-  fall back to macOS. All five skins are code-split and selectable live via the corner switcher.
+- **Skin routing + enforcement:** Apple → iOS / iPadOS / macOS by form factor; Android → Material
+  (adapts up to expanded layouts); Windows → Fluent (scales down to a compact icon rail);
+  unknown/Linux desktops fall back to macOS. All five skins are code-split. **Every device shows its
+  own skin by default**, and the concept is enforced in **production**: the corner switcher only lets
+  you preview the device's same-form-factor peer (phones iOS↔Android, tablets iPadOS↔Android,
+  desktops macOS↔Windows) — other skins are disabled with a prompt to open them on the real device,
+  and any stale/disallowed saved override is ignored (`peerSkin` in `src/lib/resolveSkin.ts`). In
+  **development** (`pnpm dev`) every skin is unlocked so the whole thing is buildable from one
+  machine.
 
 ## Develop
 
