@@ -66,7 +66,6 @@ export function IOSHome({ onOpen, onOpenSearch }: Readonly<IOSHomeProps>) {
   const now = useClock();
   const battery = useBattery();
   const launchers = buildLaunchers();
-  const featured = content.work[0];
 
   const openLink = (href: string) =>
     window.open(href, href.startsWith("http") ? "_blank" : "_self");
@@ -93,9 +92,9 @@ export function IOSHome({ onOpen, onOpenSearch }: Readonly<IOSHomeProps>) {
       </div>
 
       <div className="mx-auto flex w-full max-w-[26rem] flex-1 flex-col px-6 pt-5">
-        {/* Widgets — real portfolio content. */}
+        {/* Widgets — a live clock + real portfolio content. */}
         <div className="flex gap-4">
-          <WorkWidget featured={featured} onClick={() => onOpen("work")} />
+          <ClockWidget now={now} />
           <AboutWidget onClick={() => onOpen("about")} />
         </div>
 
@@ -114,12 +113,6 @@ export function IOSHome({ onOpen, onOpenSearch }: Readonly<IOSHomeProps>) {
         </div>
 
         <div className="flex-1" />
-
-        {/* Page dots */}
-        <div className="mb-3 flex items-center justify-center gap-1.5">
-          <Dot active />
-          <Dot />
-        </div>
 
         {/* Search pill */}
         <div className="mb-3 flex justify-center">
@@ -157,26 +150,44 @@ export function IOSHome({ onOpen, onOpenSearch }: Readonly<IOSHomeProps>) {
   );
 }
 
-function WorkWidget({ featured, onClick }: Readonly<{ featured: (typeof content.work)[number]; onClick: () => void }>) {
+function ClockWidget({ now }: Readonly<{ now: Date }>) {
+  const m = now.getMinutes();
+  const h = now.getHours() % 12;
+  const minDeg = m * 6;
+  const hourDeg = h * 30 + m * 0.5;
   return (
-    <button
-      onClick={onClick}
-      className="relative h-36 flex-1 overflow-hidden rounded-[20px] text-left shadow-xl"
-      style={{ textShadow: "none" }}
-    >
-      <div
-        className="absolute inset-0"
-        style={{ background: `linear-gradient(135deg,hsl(${featured.hue} 70% 55%),hsl(${(featured.hue + 40) % 360} 65% 45%))` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-      <p className="absolute left-3 top-3 text-[10px] font-semibold uppercase tracking-wider text-white/90">
-        Selected Work
-      </p>
-      <div className="absolute inset-x-3 bottom-3 text-white">
-        <p className="line-clamp-2 text-[13px] font-semibold leading-tight">{featured.title}</p>
-        <p className="mt-0.5 text-[11px] opacity-85">{featured.year}</p>
+    <div className="grid h-36 flex-1 place-items-center rounded-[20px] bg-white shadow-xl" style={{ textShadow: "none" }}>
+      <div className="relative h-24 w-24 rounded-full border border-black/10">
+        {[0, 90, 180, 270].map((d) => (
+          <span
+            key={d}
+            aria-hidden
+            className="absolute left-1/2 top-1/2 h-1 w-1 rounded-full bg-black/30"
+            style={{ transform: `rotate(${d}deg) translateY(-44px) translate(-50%,-50%)` }}
+          />
+        ))}
+        <Hand deg={hourDeg} len={28} w={3} />
+        <Hand deg={minDeg} len={38} w={2} />
+        <span className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500" />
       </div>
-    </button>
+    </div>
+  );
+}
+
+function Hand({ deg, len, w }: Readonly<{ deg: number; len: number; w: number }>) {
+  return (
+    <span
+      aria-hidden
+      className="absolute rounded-full bg-black"
+      style={{
+        left: "50%",
+        bottom: "50%",
+        width: w,
+        height: len,
+        transformOrigin: "bottom center",
+        transform: `translateX(-50%) rotate(${deg}deg)`,
+      }}
+    />
   );
 }
 
@@ -240,6 +251,3 @@ function DockIcon({
   );
 }
 
-function Dot({ active }: Readonly<{ active?: boolean }>) {
-  return <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-white" : "bg-white/40"}`} />;
-}

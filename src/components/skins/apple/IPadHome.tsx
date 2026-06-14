@@ -125,13 +125,6 @@ export function IPadHome({ onOpen, onOpenSearch }: Readonly<IPadHomeProps>) {
         </div>
 
         <div className="flex-1" />
-
-        {/* Page dots */}
-        <div className="mb-4 flex items-center justify-center gap-2">
-          <Dot active />
-          <Dot />
-          <Dot />
-        </div>
       </div>
 
       {/* Spotlight pill + dock */}
@@ -302,6 +295,3 @@ function DockIcon({
   );
 }
 
-function Dot({ active }: Readonly<{ active?: boolean }>) {
-  return <span className={`h-2 w-2 rounded-full ${active ? "bg-white" : "bg-white/40"}`} />;
-}
