@@ -53,7 +53,7 @@ export function Dock({ onOpen, openIds }: DockProps) {
             >
               <span
                 aria-hidden
-                className="grid h-12 w-12 place-items-center rounded-[14px] text-2xl"
+                className="grid h-12 w-12 place-items-center overflow-hidden rounded-[14px] text-[22px] leading-none"
                 style={{
                   background:
                     "linear-gradient(145deg, rgba(255,255,255,0.5), rgba(255,255,255,0.12))",
