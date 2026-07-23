@@ -349,13 +349,13 @@ export const content: PortfolioContent = {
   about: {
     initials: "IA",
     bio: [
-      "I'm a frontend engineer in Lagos with 5+ years building and shipping production web applications in commerce, payments, and cinema operations. I work in TypeScript, React, and Next.js, and I own the full delivery cycle — architecture, testing, CI/CD, and deployment.",
+      "I'm a frontend engineer in Lagos with 5 years building and shipping production web applications in commerce, payments, and cinema operations. I work in TypeScript, React, and Next.js, and I own the full delivery cycle — architecture, testing, CI/CD, and deployment.",
       "I've taken three products from initial commit to live users and led a team of 7 engineers across six production applications. The work I'm proudest of is the unglamorous kind: an escrow flow people trust with their money, a feed that stops stuttering on a mid-range Android, a point-of-sale terminal that keeps selling tickets when the network drops.",
       "Most of my impact shows up as numbers someone else cares about — 25% more online bookings, 90% less manual data entry, 20% fewer production defects. I like ambiguous problems, tight feedback loops, and shipping things people use every day.",
     ],
     facts: [
       { label: "Based in", value: "Lagos, Nigeria" },
-      { label: "Experience", value: "5+ years, frontend engineering" },
+      { label: "Experience", value: "5 years, frontend engineering" },
       { label: "Currently", value: "Frontend Engineer at Yadsale" },
       { label: "Education", value: "BSc Applied Botany, University of Lagos" },
     ],
