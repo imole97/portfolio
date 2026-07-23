@@ -97,7 +97,7 @@ export function IOSShell() {
         ) : (
           <div
             className="absolute inset-0"
-            style={{ background: "color-mix(in srgb, var(--bg) 55%, transparent)" }}
+            style={{ background: "color-mix(in srgb, var(--bg) 94%, transparent)" }}
           />
         )}
       </div>

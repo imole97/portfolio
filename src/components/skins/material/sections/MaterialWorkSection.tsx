@@ -1,18 +1,13 @@
 "use client";
 
-// Work list -> detail using the signature container transform. (DESIGN-SYSTEM §7)
+// Experience list -> role detail using the signature container transform. (DESIGN-SYSTEM §7)
 
 import { useEffect, useRef, useState } from "react";
 import { content, type CaseStudy } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { captureFlip, containerTransform, staggerReveal } from "@/lib/motion/material";
+import { BrandMark, brandTint } from "@/components/BrandMark";
 import { MaterialCard } from "../MaterialCard";
-
-function coverStyle(hue: number): React.CSSProperties {
-  return {
-    background: `linear-gradient(135deg, hsl(${hue} 70% 60%), hsl(${(hue + 40) % 360} 65% 48%))`,
-  };
-}
 
 export function MaterialWorkSection() {
   const { reducedMotion } = useSkin();
@@ -44,7 +39,7 @@ export function MaterialWorkSection() {
 
   if (active) {
     return (
-      <article className="md-work-detail">
+      <article className="md-work-detail" style={{ color: "var(--md-on-surface)" }}>
         <button
           onClick={back}
           className="mb-4 inline-flex items-center gap-2 rounded-[var(--md-radius-full)] px-4 py-2 text-[14px] font-medium"
@@ -53,75 +48,145 @@ export function MaterialWorkSection() {
           ← Back
         </button>
 
-        <div
+        <BrandMark
           data-flip-id={`md-cover-${active.slug}`}
-          className="mb-5 h-48 w-full rounded-[var(--md-radius-lg)]"
-          style={coverStyle(active.hue)}
+          brand={active.brand}
+          name={active.title}
+          logoHeight={34}
+          className="mb-5 h-36 w-full rounded-[var(--md-radius-lg)]"
         />
 
-        <p className="text-[13px]" style={{ color: "var(--md-on-surface-variant)" }}>
-          {active.role} · {active.year}
+        <h2 className="text-2xl font-semibold">{active.title}</h2>
+        <p className="mt-1 text-[15px] font-medium" style={{ color: "var(--md-primary)" }}>
+          {active.role}
         </p>
-        <h2 className="mt-1 text-2xl font-semibold">{active.title}</h2>
+        <p className="mt-0.5 text-[13px]" style={{ color: "var(--md-on-surface-variant)" }}>
+          {active.year} · {active.location}
+        </p>
+        {active.href && (
+          <a
+            href={active.href}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 inline-block text-[13px] font-medium underline"
+            style={{ color: "var(--md-primary)" }}
+          >
+            Visit product ↗
+          </a>
+        )}
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          {active.tags.map((t) => (
-            <span
-              key={t}
-              className="rounded-[var(--md-radius-full)] px-3 py-1 text-[12px]"
-              style={{ background: "var(--md-surface-variant)", color: "var(--md-on-surface-variant)" }}
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-
-        <Block label="Problem">
-          <p>{active.problem}</p>
+        <Block label="Context">
+          <p>{active.context}</p>
         </Block>
-        <Block label="Process">
-          <ol className="list-decimal space-y-1.5 pl-5">
-            {active.process.map((s, i) => (
-              <li key={i}>{s}</li>
+        <Block label="What I shipped">
+          <ul className="list-disc space-y-2 pl-5">
+            {active.highlights.map((s) => (
+              <li key={s}>{s}</li>
             ))}
-          </ol>
+          </ul>
         </Block>
-        <Block label="Outcome">
+        <Block label="Impact">
           <p>{active.outcome}</p>
+        </Block>
+        <Block label="Stack">
+          <div className="flex flex-wrap gap-2">
+            {active.stack.map((t) => (
+              <span
+                key={t}
+                className="rounded-[var(--md-radius-full)] px-3 py-1 text-[12px]"
+                style={{ background: brandTint(active.brand), color: "var(--md-on-surface)" }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
         </Block>
       </article>
     );
   }
 
   return (
-    <div ref={listRef} className="grid grid-cols-1 gap-4 md:grid-cols-2">
-      {content.work.map((study) => (
-        <MaterialCard
-          key={study.slug}
-          onClick={() => open(study)}
-          className="md-work-card overflow-hidden p-0"
-        >
-          <div
-            data-flip-id={`md-cover-${study.slug}`}
-            className="h-32 w-full"
-            style={coverStyle(study.hue)}
-          />
-          <div className="p-4">
-            <p className="text-[12px]" style={{ color: "var(--md-on-surface-variant)" }}>
-              {study.year} · {study.tags[0]}
-            </p>
-            <h3 className="mt-1 text-[16px] font-semibold leading-snug">{study.title}</h3>
-            <p className="mt-1.5 text-[14px]" style={{ color: "var(--md-on-surface-variant)" }}>
-              {study.summary}
-            </p>
-          </div>
-        </MaterialCard>
-      ))}
+    <div style={{ color: "var(--md-on-surface)" }}>
+      <div ref={listRef} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {content.work.map((study) => (
+          <MaterialCard
+            key={study.slug}
+            onClick={() => open(study)}
+            className="md-work-card overflow-hidden p-0"
+          >
+            <BrandMark
+              data-flip-id={`md-cover-${study.slug}`}
+              brand={study.brand}
+              name={study.title}
+              logoHeight={24}
+              className="h-24 w-full"
+            />
+            <div className="p-4" style={{ borderTop: `2px solid ${study.brand.to}` }}>
+              <p className="text-[12px]" style={{ color: "var(--md-on-surface-variant)" }}>
+                {study.year}
+              </p>
+              <h3 className="mt-1 text-[16px] font-semibold leading-snug">{study.title}</h3>
+              <p className="text-[13px] font-medium" style={{ color: "var(--md-primary)" }}>
+                {study.role}
+              </p>
+              <p className="mt-1.5 text-[14px]" style={{ color: "var(--md-on-surface-variant)" }}>
+                {study.summary}
+              </p>
+              <div className="mt-2.5 flex flex-wrap gap-1.5">
+                {study.tags.slice(0, 3).map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-[var(--md-radius-full)] px-2 py-0.5 text-[11px]"
+                    style={{ background: brandTint(study.brand, 18), color: "var(--md-on-surface)" }}
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </MaterialCard>
+        ))}
+      </div>
+
+      <h3
+        className="mb-3 mt-7 text-[13px] font-semibold uppercase tracking-wide"
+        style={{ color: "var(--md-on-surface-variant)" }}
+      >
+        Selected projects
+      </h3>
+      <ul
+        className="overflow-hidden rounded-[var(--md-radius-lg)]"
+        style={{ background: "var(--md-surface-container)" }}
+      >
+        {content.projects.map((p, i) => (
+          <li
+            key={p.name}
+            style={{ borderTop: i === 0 ? undefined : "1px solid var(--md-outline-variant)" }}
+          >
+            <a
+              href={p.href}
+              target="_blank"
+              rel="noreferrer"
+              className="block px-4 py-3 transition-opacity hover:opacity-70"
+            >
+              <p className="text-[15px] font-semibold">
+                {p.name} <span style={{ color: "var(--md-primary)" }}>↗</span>
+              </p>
+              <p className="mt-0.5 text-[13px]" style={{ color: "var(--md-on-surface-variant)" }}>
+                {p.blurb}
+              </p>
+              <p className="mt-0.5 text-[12px]" style={{ color: "var(--md-on-surface-variant)" }}>
+                {p.role}
+              </p>
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
-function Block({ label, children }: { label: string; children: React.ReactNode }) {
+function Block({ label, children }: Readonly<{ label: string; children: React.ReactNode }>) {
   return (
     <section className="mt-5">
       <h4

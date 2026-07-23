@@ -61,7 +61,7 @@ export function MaterialApp({ section, onBack, onOpen }: Readonly<MaterialAppPro
 
       {section === "work" && (
         <div className="absolute bottom-6 right-4 z-[310]">
-          <FAB label="Contact" icon="✉️" extended onClick={() => onOpen("contact")} />
+          <FAB label="Contact" icon="📇" extended onClick={() => onOpen("contact")} />
         </div>
       )}
     </div>

@@ -5,6 +5,8 @@
   --bg: #f2f2f7;
 
   --glass-bg: rgba(255, 255, 255, 0.65);
+  /* Reading surfaces (windows, app panels) — opaque enough for body copy. */
+  --glass-bg-strong: rgba(250, 250, 252, 0.94);
   --glass-blur: 40px;
   --glass-saturate: 180%;
   --glass-highlight: rgba(255, 255, 255, 0.5);
@@ -17,6 +19,13 @@
   --text-primary: #1c1c1e;
   --text-secondary: rgba(60, 60, 67, 0.6);
   --separator: rgba(60, 60, 67, 0.18);
+
+  /* Floating overlay (skin switcher) — glass, at reading strength. */
+  --overlay-bg: var(--glass-bg-strong);
+  --overlay-border: var(--glass-border);
+  --overlay-shadow: var(--glass-shadow);
+  --overlay-blur: var(--glass-blur);
+  --overlay-accent: var(--accent);
 
   /* Radii */
   --radius-card: 20px;
@@ -39,6 +48,7 @@
     --bg: #000000;
 
     --glass-bg: rgba(30, 30, 32, 0.55);
+    --glass-bg-strong: rgba(22, 22, 24, 0.94);
     --glass-highlight: rgba(255, 255, 255, 0.16);
     --glass-border: rgba(255, 255, 255, 0.12);
     --glass-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
@@ -59,6 +69,7 @@
   --bg: #000000;
 
   --glass-bg: rgba(30, 30, 32, 0.55);
+  --glass-bg-strong: rgba(22, 22, 24, 0.94);
   --glass-highlight: rgba(255, 255, 255, 0.16);
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.7);

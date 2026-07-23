@@ -4,6 +4,7 @@
 // Subtle pointer-hover state; gated behind (pointer: fine) via CSS hover.
 
 import { content, sectionMeta, type SectionId } from "@/lib/content";
+import { APPLE_SECTION_ICON, AppleIconImage } from "./appleIcons";
 
 const ITEMS: SectionId[] = ["work", "about", "settings", "contact"];
 
@@ -39,9 +40,19 @@ export function Sidebar({ active, onSelect }: Readonly<SidebarProps>) {
               color: isActive ? "#fff" : "var(--text-primary)",
             }}
           >
-            <span aria-hidden className="text-lg leading-none">
-              {meta.emoji}
-            </span>
+            {APPLE_SECTION_ICON[id] ? (
+              <span aria-hidden className="h-6 w-6 shrink-0 overflow-hidden rounded-[6px]">
+                <AppleIconImage
+                  src={APPLE_SECTION_ICON[id]}
+                  label={meta.label}
+                  rounded="rounded-[6px]"
+                />
+              </span>
+            ) : (
+              <span aria-hidden className="grid h-6 w-6 shrink-0 place-items-center text-lg leading-none">
+                {meta.emoji}
+              </span>
+            )}
             <span className="font-medium">{meta.label}</span>
           </button>
         );

@@ -5,10 +5,8 @@ import { content } from "@/lib/content";
 export function MaterialContactSection() {
   const { contact } = content;
   return (
-    <div>
-      <p className="mb-5 text-[15px] leading-relaxed">
-        Have a project, a role, or just a good idea? I&apos;d love to hear about it.
-      </p>
+    <div style={{ color: "var(--md-on-surface)" }}>
+      <p className="mb-5 text-[15px] leading-relaxed">{contact.blurb}</p>
 
       <a
         href={`mailto:${contact.email}`}
@@ -39,10 +37,12 @@ export function MaterialContactSection() {
 
       <a
         href={contact.resumeHref}
+        target="_blank"
+        rel="noreferrer"
         className="mt-5 inline-flex items-center gap-2 rounded-[var(--md-radius-full)] px-5 py-2.5 text-[14px] font-medium"
         style={{ border: "1px solid var(--md-outline)", color: "var(--md-on-surface)" }}
       >
-        ⬇ Download résumé
+        📄 View résumé ↗
       </a>
     </div>
   );

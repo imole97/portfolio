@@ -5,12 +5,13 @@
 // intentionally omitted; the only status shown is a *real* battery level when the device
 // exposes one (Battery Status API). (§4.2)
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { content, sectionMeta, type SectionId } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { homeReveal } from "@/lib/motion/material";
 import { useBattery } from "@/lib/useBattery";
 import { BatteryGlyph } from "@/components/BatteryGlyph";
+import { launcherGlyph } from "@/components/BrandIcons";
 import { useRipple } from "./useRipple";
 
 const SECTIONS: SectionId[] = ["work", "about", "settings", "contact"];
@@ -26,16 +27,15 @@ const SECTION_TINT: Record<SectionId, { bg: string; fg: string }> = {
 
 interface Launcher {
   label: string;
-  glyph: string;
+  glyph: ReactNode;
   bg: string;
   fg: string;
   href: string;
 }
 
-const LAUNCHER_STYLE: Record<string, { glyph: string; bg: string; fg: string }> = {
-  GitHub: { glyph: "🐙", bg: "#1f2328", fg: "#ffffff" },
-  LinkedIn: { glyph: "in", bg: "#0a66c2", fg: "#ffffff" },
-  "Twitter / X": { glyph: "𝕏", bg: "#000000", fg: "#ffffff" },
+const LAUNCHER_STYLE: Record<string, { glyph: ReactNode; bg: string; fg: string }> = {
+  GitHub: { glyph: launcherGlyph("GitHub", "", 26), bg: "#1f2328", fg: "#ffffff" },
+  LinkedIn: { glyph: launcherGlyph("LinkedIn", "", 26), bg: "#0a66c2", fg: "#ffffff" },
 };
 
 function buildLaunchers(): Launcher[] {
@@ -43,7 +43,7 @@ function buildLaunchers(): Launcher[] {
     .filter((l) => l.label !== "Email")
     .map((l) => {
       const s = LAUNCHER_STYLE[l.label] ?? { glyph: "🔗", bg: "var(--md-primary)", fg: "var(--md-on-primary)" };
-      return { label: l.label === "Twitter / X" ? "X" : l.label, ...s, href: l.href };
+      return { label: l.label, ...s, href: l.href };
     });
   links.push({
     label: "Résumé",
@@ -152,9 +152,9 @@ function AppIcon({
   bg,
   fg,
   onClick,
-}: Readonly<{ label: string; glyph: string; bg: string; fg: string; onClick: () => void }>) {
+}: Readonly<{ label: string; glyph: ReactNode; bg: string; fg: string; onClick: () => void }>) {
   const onRipple = useRipple<HTMLButtonElement>();
-  const isLetter = /^[A-Za-z]/.test(glyph);
+  const isLetter = typeof glyph === "string" && /^[A-Za-z]/.test(glyph);
   return (
     <button
       data-icon

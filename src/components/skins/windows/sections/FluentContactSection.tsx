@@ -5,10 +5,8 @@ import { content } from "@/lib/content";
 export function FluentContactSection() {
   const { contact } = content;
   return (
-    <div className="max-w-2xl">
-      <p className="mb-5 text-[15px] leading-relaxed">
-        Have a project, a role, or just a good idea? I&apos;d love to hear about it.
-      </p>
+    <div className="max-w-2xl" style={{ color: "var(--fl-text)" }}>
+      <p className="mb-5 text-[15px] leading-relaxed">{contact.blurb}</p>
 
       <a
         href={`mailto:${contact.email}`}
@@ -38,6 +36,16 @@ export function FluentContactSection() {
           ))}
         </ul>
       </div>
+
+      <a
+        href={contact.resumeHref}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-5 inline-flex items-center gap-2 rounded-[var(--fl-radius-sm)] px-4 py-2 text-[14px] font-medium"
+        style={{ border: "1px solid var(--fl-stroke-strong)", color: "var(--fl-text)" }}
+      >
+        📄 View résumé ↗
+      </a>
     </div>
   );
 }

@@ -105,7 +105,7 @@ export function IPadOSShell() {
             </div>
           )}
 
-          <section className="glass glass-specular relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden rounded-[var(--radius-card)]">
+          <section className="glass glass-strong glass-specular relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden rounded-[var(--radius-card)]">
             {/* Detail toolbar */}
             <header
               className="flex h-12 shrink-0 items-center gap-3 px-4"

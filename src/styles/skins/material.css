@@ -24,6 +24,15 @@
   --md-outline: #79747e;
   --md-outline-variant: #cac4d0;
 
+  /* Floating overlay (skin switcher) — an opaque tonal menu surface. Literal M3
+     neutrals, not var(--md-*): the dynamic-color roles are injected inline on the
+     shell element, and the switcher renders as its sibling. */
+  --overlay-bg: #ece6f0;
+  --overlay-border: #cac4d0;
+  --overlay-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+  --overlay-blur: 0px;
+  --overlay-accent: #6750a4;
+
   /* Expressive shape scale. */
   --md-radius-xs: 8px;
   --md-radius-sm: 12px;
@@ -67,4 +76,22 @@
     transform: scale(0);
     will-change: transform, opacity;
   }
+}
+
+/* Dark appearance for the overlay — under system-dark (unless forced light) or an
+   explicit data-theme=dark. The skin's own surfaces are handled by dynamic color. */
+@media (prefers-color-scheme: dark) {
+  [data-skin="android"]:not([data-theme="light"]) {
+    --overlay-bg: #2b2930;
+    --overlay-border: #49454f;
+    --overlay-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+    --overlay-accent: #d0bcff;
+  }
+}
+
+[data-skin="android"][data-theme="dark"] {
+  --overlay-bg: #2b2930;
+  --overlay-border: #49454f;
+  --overlay-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+  --overlay-accent: #d0bcff;
 }

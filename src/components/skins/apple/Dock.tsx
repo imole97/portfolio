@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 import { sectionMeta, type SectionId } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { createDockMagnifier } from "@/lib/motion/apple";
+import { APPLE_SECTION_ICON, AppleIconImage } from "./appleIcons";
 
 const DOCK_ITEMS: SectionId[] = ["work", "about", "settings", "contact"];
 
@@ -40,6 +41,7 @@ export function Dock({ onOpen, openIds }: DockProps) {
         {DOCK_ITEMS.map((id, i) => {
           const meta = sectionMeta[id];
           const isOpen = openIds.includes(id);
+          const img = APPLE_SECTION_ICON[id];
           return (
             <button
               key={id}
@@ -54,13 +56,21 @@ export function Dock({ onOpen, openIds }: DockProps) {
               <span
                 aria-hidden
                 className="grid h-12 w-12 place-items-center overflow-hidden rounded-[14px] text-[22px] leading-none"
-                style={{
-                  background:
-                    "linear-gradient(145deg, rgba(255,255,255,0.5), rgba(255,255,255,0.12))",
-                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5)",
-                }}
+                style={
+                  img
+                    ? undefined
+                    : {
+                        background:
+                          "linear-gradient(145deg, rgba(255,255,255,0.5), rgba(255,255,255,0.12))",
+                        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5)",
+                      }
+                }
               >
-                {meta.emoji}
+                {img ? (
+                  <AppleIconImage src={img} label={meta.label} rounded="rounded-[14px]" />
+                ) : (
+                  meta.emoji
+                )}
               </span>
               <span
                 aria-hidden

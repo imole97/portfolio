@@ -46,7 +46,7 @@ export function MaterialShell() {
         {open ? (
           <div
             className="absolute inset-0"
-            style={{ background: "color-mix(in srgb, var(--md-background) 38%, transparent)" }}
+            style={{ background: "color-mix(in srgb, var(--md-background) 95%, transparent)" }}
           />
         ) : (
           <div

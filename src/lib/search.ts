@@ -36,25 +36,43 @@ export function buildSearchIndex(): SearchItem[] {
   content.work.forEach((w) =>
     out.push({
       id: `work-${w.slug}`,
-      label: w.title,
-      hint: `Case study · ${w.year}`,
+      label: `${w.title} — ${w.role}`,
+      hint: `Experience · ${w.year}`,
       glyph: "🗂️",
       section: "work",
-      keywords: `${w.summary} ${w.role} ${w.tags.join(" ")}`.toLowerCase(),
+      keywords: `${w.summary} ${w.role} ${w.context} ${w.tags.join(" ")} ${w.stack.join(" ")}`.toLowerCase(),
     }),
   );
 
-  content.about.skills.forEach((s) =>
-    out.push({ id: `skill-${s}`, label: s, hint: "Skill", glyph: "✦", section: "about", keywords: s.toLowerCase() }),
+  content.projects.forEach((p) =>
+    out.push({
+      id: `project-${p.name}`,
+      label: p.name,
+      hint: "Project",
+      glyph: "🚀",
+      section: "work",
+      href: p.href,
+      keywords: `${p.blurb} ${p.role}`.toLowerCase(),
+    }),
   );
-  content.about.tools.forEach((t) =>
-    out.push({ id: `tool-${t}`, label: t, hint: "Tool", glyph: "🛠️", section: "about", keywords: t.toLowerCase() }),
+
+  content.about.skillGroups.forEach((g) =>
+    g.items.forEach((item) =>
+      out.push({
+        id: `skill-${g.title}-${item}`,
+        label: item,
+        hint: g.title,
+        glyph: "✦",
+        section: "about",
+        keywords: `${item} ${g.title}`.toLowerCase(),
+      }),
+    ),
   );
 
   content.contact.links.forEach((l) =>
     out.push({
       id: `link-${l.label}`,
-      label: l.label === "Twitter / X" ? "X (Twitter)" : l.label,
+      label: l.label,
       hint: "Contact",
       glyph: l.label === "Email" ? "✉️" : "🔗",
       section: "contact",

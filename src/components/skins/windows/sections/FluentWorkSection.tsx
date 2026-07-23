@@ -1,19 +1,14 @@
 "use client";
 
-// Work list -> detail with the signature connected animation. (DESIGN-SYSTEM §7)
+// Experience list -> role detail with the signature connected animation. (DESIGN-SYSTEM §7)
 // A thumbnail flies from the list into the detail header.
 
 import { useEffect, useRef, useState } from "react";
 import { content, type CaseStudy } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { captureFlip, connectedAnimation, entranceSlide } from "@/lib/motion/fluent";
+import { BrandMark, brandTint } from "@/components/BrandMark";
 import { FluentCard } from "../FluentCard";
-
-function coverStyle(hue: number): React.CSSProperties {
-  return {
-    background: `linear-gradient(135deg, hsl(${hue} 55% 52%), hsl(${(hue + 40) % 360} 50% 42%))`,
-  };
-}
 
 export function FluentWorkSection() {
   const { reducedMotion } = useSkin();
@@ -45,7 +40,7 @@ export function FluentWorkSection() {
 
   if (active) {
     return (
-      <article className="fl-work-detail max-w-3xl">
+      <article className="fl-work-detail max-w-3xl" style={{ color: "var(--fl-text)" }}>
         <button
           onClick={back}
           className="mb-4 inline-flex items-center gap-2 rounded-[var(--fl-radius-sm)] px-3 py-1.5 text-[13px] font-medium"
@@ -55,68 +50,140 @@ export function FluentWorkSection() {
         </button>
 
         <div className="flex items-center gap-4">
-          <div
+          <BrandMark
             data-flip-id={`fl-cover-${active.slug}`}
+            brand={active.brand}
+            name={active.title}
+            logoHeight={18}
             className="h-20 w-32 shrink-0 rounded-[var(--fl-radius)]"
-            style={coverStyle(active.hue)}
           />
           <div>
-            <p className="text-[13px]" style={{ color: "var(--fl-text-secondary)" }}>
-              {active.role} · {active.year}
-            </p>
             <h2 className="text-2xl font-semibold">{active.title}</h2>
+            <p className="text-[15px] font-medium" style={{ color: "var(--fl-accent)" }}>
+              {active.role}
+            </p>
+            <p className="text-[13px]" style={{ color: "var(--fl-text-secondary)" }}>
+              {active.year} · {active.location}
+            </p>
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          {active.tags.map((t) => (
-            <span
-              key={t}
-              className="rounded-[var(--fl-radius-sm)] px-2.5 py-1 text-[12px]"
-              style={{ background: "var(--fl-subtle-hover)", color: "var(--fl-text-secondary)" }}
-            >
-              {t}
-            </span>
-          ))}
-        </div>
+        <p className="mt-3 text-[15px]" style={{ color: "var(--fl-text-secondary)" }}>
+          {active.summary}
+        </p>
+        {active.href && (
+          <a
+            href={active.href}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-1 inline-block text-[13px] font-medium hover:underline"
+            style={{ color: "var(--fl-accent)" }}
+          >
+            Visit product ↗
+          </a>
+        )}
 
-        <Block label="Problem">
-          <p>{active.problem}</p>
+        <Block label="Context">
+          <p>{active.context}</p>
         </Block>
-        <Block label="Process">
-          <ol className="list-decimal space-y-1.5 pl-5">
-            {active.process.map((s, i) => (
-              <li key={i}>{s}</li>
+        <Block label="What I shipped">
+          <ul className="list-disc space-y-2 pl-5">
+            {active.highlights.map((s) => (
+              <li key={s}>{s}</li>
             ))}
-          </ol>
+          </ul>
         </Block>
-        <Block label="Outcome">
+        <Block label="Impact">
           <p>{active.outcome}</p>
+        </Block>
+        <Block label="Stack">
+          <div className="flex flex-wrap gap-2">
+            {active.stack.map((t) => (
+              <span
+                key={t}
+                className="rounded-[var(--fl-radius-sm)] px-2.5 py-1 text-[12px]"
+                style={{ background: brandTint(active.brand), color: "var(--fl-text)" }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
         </Block>
       </article>
     );
   }
 
   return (
-    <div ref={listRef} className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {content.work.map((study) => (
-        <FluentCard key={study.slug} onClick={() => open(study)} className="fl-work-card">
-          <div
-            data-flip-id={`fl-cover-${study.slug}`}
-            className="h-28 w-full"
-            style={coverStyle(study.hue)}
-          />
-          <div className="p-3.5">
-            <p className="text-[12px]" style={{ color: "var(--fl-text-secondary)" }}>
-              {study.year} · {study.tags[0]}
-            </p>
-            <h3 className="mt-1 text-[15px] font-semibold leading-snug">{study.title}</h3>
-            <p className="mt-1.5 text-[13px]" style={{ color: "var(--fl-text-secondary)" }}>
-              {study.summary}
-            </p>
-          </div>
-        </FluentCard>
-      ))}
+    <div style={{ color: "var(--fl-text)" }}>
+      {/* Two columns max: these render inside a ~760px Fluent window, and Tailwind's
+          viewport-keyed breakpoints (xl:) would otherwise cram 3 columns into it. */}
+      <div ref={listRef} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {content.work.map((study) => (
+          <FluentCard key={study.slug} onClick={() => open(study)} className="fl-work-card">
+            <BrandMark
+              data-flip-id={`fl-cover-${study.slug}`}
+              brand={study.brand}
+              name={study.title}
+              logoHeight={22}
+              className="h-24 w-full"
+            />
+            <div className="p-3.5" style={{ borderTop: `2px solid ${study.brand.to}` }}>
+              <p className="text-[12px]" style={{ color: "var(--fl-text-secondary)" }}>
+                {study.year}
+              </p>
+              <h3 className="mt-1 text-[15px] font-semibold leading-snug">{study.title}</h3>
+              <p className="text-[13px] font-medium" style={{ color: "var(--fl-accent)" }}>
+                {study.role}
+              </p>
+              <p className="mt-1.5 text-[13px]" style={{ color: "var(--fl-text-secondary)" }}>
+                {study.summary}
+              </p>
+              <div className="mt-2.5 flex flex-wrap gap-1.5">
+                {study.tags.slice(0, 3).map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-[var(--fl-radius-sm)] px-2 py-0.5 text-[11px]"
+                    style={{ background: brandTint(study.brand, 18), color: "var(--fl-text)" }}
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </FluentCard>
+        ))}
+      </div>
+
+      <h3
+        className="mb-3 mt-7 text-[13px] font-semibold uppercase tracking-wide"
+        style={{ color: "var(--fl-text-secondary)" }}
+      >
+        Selected projects
+      </h3>
+      <div className="fluent-card max-w-3xl overflow-hidden">
+        <ul>
+          {content.projects.map((p, i) => (
+            <li key={p.name} style={{ borderTop: i === 0 ? undefined : "1px solid var(--fl-stroke)" }}>
+              <a
+                href={p.href}
+                target="_blank"
+                rel="noreferrer"
+                className="block px-4 py-3 transition-colors hover:bg-[var(--fl-subtle-hover)]"
+              >
+                <p className="text-[15px] font-semibold">
+                  {p.name} <span style={{ color: "var(--fl-accent)" }}>↗</span>
+                </p>
+                <p className="mt-0.5 text-[13px]" style={{ color: "var(--fl-text-secondary)" }}>
+                  {p.blurb}
+                </p>
+                <p className="mt-0.5 text-[12px]" style={{ color: "var(--fl-text-secondary)" }}>
+                  {p.role}
+                </p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

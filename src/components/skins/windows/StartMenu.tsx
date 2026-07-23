@@ -3,30 +3,29 @@
 // Windows 11 Start menu — search, pinned grid (sections + launchers), recommended,
 // and an account + power footer. (DESIGN-SYSTEM §4.3)
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { content, sectionMeta, type SectionId } from "@/lib/content";
 import { useSkin } from "@/components/SkinProvider";
 import { entranceSlide } from "@/lib/motion/fluent";
 import { buildSearchIndex, searchPortfolio, type SearchItem } from "@/lib/search";
+import { BrandMark } from "@/components/BrandMark";
+import { launcherGlyph } from "@/components/BrandIcons";
 import { useReveal } from "./useReveal";
 
 interface Launcher {
   label: string;
-  icon: string;
+  icon: ReactNode;
   href: string;
 }
 
 const LAUNCHER_ICONS: Record<string, string> = {
   Email: "✉️",
-  GitHub: "🐙",
-  LinkedIn: "💼",
-  "Twitter / X": "𝕏",
 };
 
 function buildLaunchers(): Launcher[] {
   const links = content.contact.links.map((l) => ({
-    label: l.label === "Twitter / X" ? "X" : l.label,
-    icon: LAUNCHER_ICONS[l.label] ?? "🔗",
+    label: l.label,
+    icon: launcherGlyph(l.label, LAUNCHER_ICONS[l.label] ?? "🔗", 24),
     href: l.href,
   }));
   return [...links, { label: "Résumé", icon: "📄", href: content.contact.resumeHref }];
@@ -158,10 +157,12 @@ export function StartMenu({ onClose, onOpenSection }: Readonly<StartMenuProps>) 
                   onClick={() => openSection("work")}
                   className="flex items-center gap-3 rounded-[var(--fl-radius-sm)] px-2 py-2 text-left transition-colors hover:bg-[var(--fl-subtle-hover)]"
                 >
-                  <span
-                    aria-hidden
+                  <BrandMark
+                    brand={w.brand}
+                    name={w.title}
+                    logoHeight={11}
+                    monogramOnly
                     className="h-8 w-8 shrink-0 rounded-[6px]"
-                    style={{ background: `linear-gradient(135deg, hsl(${w.hue} 60% 55%), hsl(${(w.hue + 40) % 360} 55% 45%))` }}
                   />
                   <span className="min-w-0">
                     <span className="block truncate text-[13px] font-medium">{w.title}</span>
@@ -203,7 +204,7 @@ export function StartMenu({ onClose, onOpenSection }: Readonly<StartMenuProps>) 
   );
 }
 
-function Tile({ icon, label, onClick }: Readonly<{ icon: string; label: string; onClick: () => void }>) {
+function Tile({ icon, label, onClick }: Readonly<{ icon: ReactNode; label: string; onClick: () => void }>) {
   const reveal = useReveal<HTMLButtonElement>();
   return (
     <button
@@ -211,7 +212,9 @@ function Tile({ icon, label, onClick }: Readonly<{ icon: string; label: string; 
       onClick={onClick}
       className="reveal flex flex-col items-center gap-1.5 rounded-[var(--fl-radius-sm)] px-1 py-3 transition-colors hover:bg-[var(--fl-subtle-hover)]"
     >
-      <span aria-hidden className="text-[26px] leading-none">{icon}</span>
+      <span aria-hidden className="grid h-[26px] place-items-center text-[26px] leading-none">
+        {icon}
+      </span>
       <span className="w-full truncate text-center text-[11px]">{label}</span>
     </button>
   );

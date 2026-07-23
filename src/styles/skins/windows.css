@@ -19,6 +19,13 @@
     radial-gradient(120% 120% at 100% 0%, rgba(136, 96, 208, 0.06), transparent 40%),
     #f3f3f3;
 
+  /* Floating overlay (skin switcher) — a solid Fluent flyout with a 1px stroke. */
+  --overlay-bg: var(--fl-card);
+  --overlay-border: var(--fl-stroke-strong);
+  --overlay-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.35);
+  --overlay-blur: 0px;
+  --overlay-accent: var(--fl-accent);
+
   /* Crisper than Apple/Android. */
   --fl-radius: 8px;
   --fl-radius-sm: 4px;

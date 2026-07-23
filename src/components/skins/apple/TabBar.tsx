@@ -5,6 +5,7 @@
 
 import { sectionMeta, type SectionId } from "@/lib/content";
 import { cn } from "@/lib/cn";
+import { APPLE_SECTION_ICON, AppleIconImage } from "./appleIcons";
 
 const TABS: SectionId[] = ["work", "about", "settings", "contact"];
 
@@ -33,9 +34,19 @@ export function TabBar({ active, onSelect }: Readonly<TabBarProps>) {
               aria-label={meta.label}
               className="flex flex-1 flex-col items-center gap-0.5 rounded-2xl px-2 py-1.5 transition-transform active:scale-95"
             >
-              <span aria-hidden className="text-xl leading-none">
-                {meta.emoji}
-              </span>
+              {APPLE_SECTION_ICON[id] ? (
+                <span aria-hidden className="h-7 w-7 overflow-hidden rounded-[7px]">
+                  <AppleIconImage
+                    src={APPLE_SECTION_ICON[id]}
+                    label={meta.label}
+                    rounded="rounded-[7px]"
+                  />
+                </span>
+              ) : (
+                <span aria-hidden className="grid h-7 w-7 place-items-center text-xl leading-none">
+                  {meta.emoji}
+                </span>
+              )}
               <span
                 className={cn("text-[10px] font-medium")}
                 style={{ color: isActive ? "var(--accent)" : "var(--text-secondary)" }}

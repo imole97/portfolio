@@ -1,6 +1,5 @@
 // Single source of truth for all portfolio content.
 // Every skin consumes this — write once, render N ways. (DESIGN-SYSTEM §5, §9)
-// Swap the placeholder copy below for your real details; the shape stays the same.
 
 export type SectionId = "work" | "about" | "settings" | "contact";
 
@@ -8,36 +7,73 @@ export interface Hero {
   name: string;
   role: string;
   thesis: string;
+  location: string;
   cta: { label: string; href: string };
+}
+
+export interface Brand {
+  /** Logo file in /public. Omit to fall back to an initials monogram. */
+  logo?: string;
+  /** The asset already reads against the tile — a square mark with its own
+      background, or a light-on-dark wordmark — so it skips the light plate. */
+  bleed?: boolean;
+  /** Gradient stops, both sampled from the logo. */
+  from: string;
+  to: string;
+  /** Foreground that reads on the gradient (monogram, overlay text). */
+  on: string;
 }
 
 export interface CaseStudy {
   slug: string;
+  /** Company / product name — the card headline. */
   title: string;
+  /** One-line product descriptor. */
   summary: string;
+  /** Title held at the company. */
   role: string;
+  /** Date range, e.g. "Sep 2025 — Present". */
   year: string;
+  location: string;
+  /** Headline technologies shown on the card. */
   tags: string[];
-  problem: string;
-  process: string[];
+  /** What the product is and the situation walked into. */
+  context: string;
+  /** What was actually shipped. */
+  highlights: string[];
+  /** The measurable result. */
   outcome: string;
-  /** Accent hue (deg) used to tint the placeholder cover gradient. */
-  hue: number;
+  /** Full technology list for the detail view. */
+  stack: string[];
+  /** Live product link, when public. */
+  href?: string;
+  /** Logo asset + colors sampled from it — no invented palettes. */
+  brand: Brand;
+}
+
+export interface Project {
+  name: string;
+  blurb: string;
+  role: string;
+  href: string;
+}
+
+export interface SkillGroup {
+  title: string;
+  items: string[];
+}
+
+export interface Fact {
+  label: string;
+  value: string;
 }
 
 export interface About {
   bio: string[];
-  skills: string[];
-  tools: string[];
-  /** Initials shown in the placeholder avatar. */
+  skillGroups: SkillGroup[];
+  facts: Fact[];
+  /** Initials shown in the avatar. */
   initials: string;
-}
-
-export interface Experiment {
-  title: string;
-  blurb: string;
-  href: string;
-  emoji: string;
 }
 
 export interface ContactLink {
@@ -49,202 +85,408 @@ export interface ContactLink {
 export interface Contact {
   email: string;
   resumeHref: string;
+  blurb: string;
   links: ContactLink[];
 }
 
 export interface PortfolioContent {
   hero: Hero;
   work: CaseStudy[];
+  projects: Project[];
   about: About;
-  play: Experiment[];
   contact: Contact;
 }
 
 export const content: PortfolioContent = {
   hero: {
     name: "Imoleayo Adebanjo",
-    role: "Product Engineer & Interaction Designer",
+    role: "Frontend Engineer",
     thesis:
-      "I build interfaces that feel native to the device they live on — and quietly impressive everywhere else.",
+      "5 years shipping production web applications in commerce, payments, and cinema — TypeScript, React, and Next.js, from first commit to live users.",
+    location: "Lagos, Nigeria",
     cta: { label: "See selected work", href: "#work" },
   },
 
   work: [
     {
-      slug: "atlas-analytics",
-      title: "Atlas — Realtime Analytics Console",
+      slug: "yadsale",
+      title: "Yadsale",
       summary:
-        "A streaming analytics dashboard handling 2M events/min with sub-100ms query feedback.",
-      role: "Lead frontend engineer · design systems",
-      year: "2025",
-      tags: ["React", "WebSockets", "Data viz", "Design system"],
-      problem:
-        "Operators were flying blind during incidents: the legacy console refreshed every 30s and buckled under load, so the team made critical calls on stale data.",
-      process: [
-        "Profiled the render pipeline and replaced polling with a backpressured WebSocket stream.",
-        "Designed a virtualized timeline + heatmap that stays at 60fps with 50k live rows.",
-        "Built a token-driven theming layer so the console matched each customer's brand.",
+        "Social commerce marketplace with escrow-backed payments and courier delivery.",
+      role: "Frontend Engineer",
+      year: "Sep 2025 — Present",
+      location: "Lagos, Nigeria (Remote)",
+      tags: ["Next.js 16", "React 19", "TypeScript", "TanStack Query"],
+      context:
+        "A social commerce marketplace where strangers transact: buyers negotiate offers, pay into escrow, choose a courier, and the seller is paid out automatically on delivery confirmation. Trust is the product, so the payment path and the browse experience both had to feel unimpeachable.",
+      highlights: [
+        "Built the end-to-end escrow payment system — offer negotiation, checkout, courier selection, and automated payout on delivery confirmation — now the company's flagship differentiator and the foundation of buyer trust on the platform.",
+        "Eliminated scroll-freezing on mid-range Android devices by rearchitecting video playback in the marketplace feed to render only visible previews, converting a stuttering browse experience into smooth 60fps scrolling for the majority of users.",
+        "Reduced layout shift to near zero by moving feed layout calculation to server-side rendering, removing the visible content reflow that occurred on every page load.",
+        "Established the frontend data-fetching architecture and enforced it with automated CI checks that block non-compliant code at merge, standardizing 130+ reusable hooks and cutting onboarding time for new engineers.",
+        "Increased page resilience during backend outages by implementing SSR with graceful client-side fallback, converting hard error pages into degraded-but-functional experiences.",
+        "Built the technical SEO and social sharing layer with auto-generated Open Graph preview cards, improving search indexing across all pages and increasing click-through on shared listings.",
       ],
       outcome:
-        "Median time-to-detect dropped 4×, and the console became the flagship in three enterprise deals.",
-      hue: 212,
+        "The escrow flow became the company's flagship differentiator, the feed scrolls at 60fps on mid-range Android with near-zero layout shift, and 130+ standardized hooks are enforced at merge.",
+      stack: [
+        "Next.js 16",
+        "React 19",
+        "TypeScript",
+        "TanStack Query",
+        "Jotai",
+        "Formik",
+        "Yup",
+        "Tailwind CSS",
+        "Paystack",
+        "Mapbox",
+        "Sentry",
+        "PostHog",
+      ],
+      href: "https://www.yadsale.com/",
+      brand: {
+        logo: "/yadsale-logo.svg",
+        from: "#013335",
+        to: "#009834",
+        on: "#ffffff",
+      },
     },
     {
-      slug: "harbor-payments",
-      title: "Harbor — Cross-border Payments",
+      slug: "korin-ai",
+      title: "Korin AI",
       summary:
-        "Rebuilt the checkout flow for a fintech moving money across 40 currencies.",
-      role: "Senior engineer · checkout & motion",
-      year: "2024",
-      tags: ["Next.js", "Stripe", "GSAP", "i18n"],
-      problem:
-        "A 5-step checkout with a 38% drop-off. Users distrusted the FX rates because the math felt hidden.",
-      process: [
-        "Collapsed five steps into one progressively-disclosed surface.",
-        "Animated the live FX conversion so users watched the number resolve in real time.",
-        "Localized currency, date, and number formatting end to end.",
+        "AI platform generating indigenous African music genres on a proprietary model.",
+      role: "Lead Frontend Engineer",
+      year: "Apr 2025 — Sep 2025",
+      location: "Lagos, Nigeria",
+      tags: ["Next.js 15", "React 19", "Redux Toolkit", "Web Audio API"],
+      context:
+        "A generative music platform for indigenous African genres, running long AI jobs on a proprietary model with no WebSocket support. I was the sole frontend engineer, owning everything from the generation interface to auth hardening and the deployment pipeline.",
+      highlights: [
+        "Led frontend development as sole frontend engineer, designing and delivering the core music generation interface — genre, mood, vocals, and lyrics configuration — contributing directly to a 50% increase in platform adoption.",
+        "Engineered an adaptive job-polling system for long-running AI generation tasks without WebSocket support, distinguishing transient network failures from genuine errors and consolidating status into a single progress indicator; now powers 9 additional platform tools.",
+        "Built a persistent global audio player mounted above the router, eliminating playback interruption on navigation and resolving an entire class of race-condition errors during buffering.",
+        "Implemented abuse-resistant play tracking with server-side validation, counting plays once at 50% completion to prevent artificially inflated streaming metrics used for artist payouts.",
+        "Hardened authentication by moving access tokens into AES-encrypted httpOnly cookies inaccessible to client JavaScript, and added mutex-guarded token refresh to prevent request storms under concurrent 401 responses.",
+        "Drove a code-quality initiative reducing blocking lint errors from 7 to 0, uncovering and fixing 2 latent production bugs, and established CSP headers and an automated deployment pipeline on AWS Amplify.",
       ],
       outcome:
-        "Drop-off fell to 19% and support tickets about 'surprise fees' effectively vanished.",
-      hue: 152,
+        "50% increase in platform adoption; the polling system now powers 9 additional platform tools, and blocking lint errors went from 7 to 0 — surfacing 2 latent production bugs on the way.",
+      stack: [
+        "Next.js 15",
+        "React 19",
+        "TypeScript",
+        "Redux Toolkit",
+        "RTK Query",
+        "Tailwind CSS",
+        "React Hook Form",
+        "Yup",
+        "Web Audio API",
+        "Paystack",
+        "AWS Amplify",
+      ],
+      href: "https://usekorinai.com/",
+      // A white wordmark, so it sits straight on the dark tile — no light plate.
+      brand: {
+        logo: "/korin-logo.webp",
+        bleed: true,
+        from: "#0d0d10",
+        to: "#2b2b35",
+        on: "#ffffff",
+      },
     },
     {
-      slug: "verdant-os",
-      title: "Verdant — Greenhouse Control OS",
+      slug: "fusion-intelligence",
+      title: "Fusion Intelligence Technologies",
       summary:
-        "A touch-first control surface for industrial greenhouses, used on the floor daily.",
-      role: "Founding designer-engineer",
-      year: "2024",
-      tags: ["IoT", "Touch UI", "Offline-first", "PWA"],
-      problem:
-        "Growers wore gloves and worked offline in humid rooms; existing tablet apps were unusable in those conditions.",
-      process: [
-        "Designed oversized, high-contrast touch targets validated with gloved testing.",
-        "Built an offline-first sync engine that reconciles on reconnect.",
-        "Shipped as an installable PWA so there was no app-store friction.",
+        "Cinema technology suite (Reach Cinema / FilmX) serving 55% of West African cinemas.",
+      role: "Frontend Engineer and Team Lead",
+      year: "Jul 2021 — Apr 2025",
+      location: "Lagos, Nigeria",
+      tags: ["Next.js", "TypeScript", "Redux Toolkit", "Docker"],
+      context:
+        "A cinema technology suite — booking sites, distributor control plane, scheduling, and point of sale — used by more than half of West African cinemas. I joined as a frontend engineer and grew into leading a team of 7 across six production applications.",
+      highlights: [
+        "Led and mentored a team of 7 engineers across six production applications, defining shared architecture, running code review, and coordinating independent release cadences.",
+        "Reduced manual data entry by approximately 90% across cinema sites by leading a team of 4 to migrate scheduling and reporting workflows from spreadsheets into the product.",
+        "Cut weekly showtime scheduling from 2 hours to 12 minutes per location by building a drag-and-drop scheduler with automated conflict detection and bulk duplication across dates and venues.",
+        "Increased online bookings by 25% and conversion rate by 15% by rebuilding the booking funnel with a mobile-optimized seat map and shareable, back-button-safe route segments.",
+        "Reduced production defects by approximately 20% by introducing the organization's first automated testing — 29 Vitest and React Testing Library suites covering booking and payment flows with SonarQube coverage reporting.",
+        "Decreased CI build times and cloud compute costs by rearchitecting the Docker image as a two-stage build with a lockfile-keyed dependency layer, skipping dependency reinstalls on source-only changes.",
+        "Enabled zero-engineer onboarding for new cinema partners by building self-service microsite provisioning as a reload-resilient state machine.",
+        "Prevented revenue loss during network outages by building an offline-first point-of-sale terminal that queues transactions locally and replays them idempotently on reconnection.",
       ],
       outcome:
-        "Adoption hit 90% of floor staff in six weeks; manual logging errors dropped by half.",
-      hue: 96,
+        "25% more online bookings and 15% higher conversion, ~90% less manual data entry, ~20% fewer production defects, and weekly scheduling cut from 2 hours to 12 minutes per location.",
+      stack: [
+        "Next.js 12–15",
+        "React 18/19",
+        "TypeScript",
+        "Redux Toolkit",
+        "RTK Query",
+        "TanStack Query",
+        "react-dnd",
+        "Vitest",
+        "Docker",
+        "CapRover",
+        "HashiCorp Vault",
+        "SonarQube",
+        "Paystack",
+      ],
+      href: "https://filmx-web.fusionintel.io/login",
+      brand: {
+        logo: "/fusion-logo1.webp",
+        from: "#d5121b",
+        to: "#f59b0b",
+        on: "#ffffff",
+      },
     },
     {
-      slug: "lumen-docs",
-      title: "Lumen — Collaborative Docs",
+      slug: "climate-mind",
+      title: "Climate Mind",
       summary:
-        "A real-time collaborative editor with presence, comments, and offline conflict resolution.",
-      role: "Frontend lead",
-      year: "2023",
-      tags: ["CRDT", "TypeScript", "Editor", "Realtime"],
-      problem:
-        "Teams lost work to merge conflicts and couldn't tell who was editing what, when.",
-      process: [
-        "Integrated a CRDT layer for conflict-free concurrent editing.",
-        "Designed ambient presence cues that never stole focus from writing.",
-        "Built a comment threading model that survived heavy concurrent edits.",
+        "Nonprofit platform connecting climate impacts and solutions to user values.",
+      role: "Frontend Engineer (Open Source)",
+      year: "Jun 2021 — Oct 2021",
+      location: "San Francisco, USA (Remote)",
+      tags: ["React", "TypeScript", "PWA", "Open Source"],
+      context:
+        "An open-source nonprofit platform that maps climate impacts and solutions onto a visitor's personal values, maintained by a distributed group of 20 contributors and reaching users on low-bandwidth mobile connections.",
+      highlights: [
+        "Improved accessibility for low-bandwidth mobile users by implementing Progressive Web App features including installability and an offline application shell.",
+        "Translated Figma designs into reusable React and TypeScript components within a codebase maintained by 20 contributors.",
+        "Reviewed pull requests on the maintainer rotation and strengthened the code review checklist, catching prop-type and state-shape defects before merge.",
       ],
       outcome:
-        "Concurrent-edit complaints went to zero; daily active editing time grew 2.3×.",
-      hue: 276,
+        "Shipped an installable, offline-capable PWA into a 20-contributor open-source codebase, with a review checklist that caught prop-type and state-shape defects before merge.",
+      stack: ["React", "TypeScript", "Docker", "Jira"],
+      href: "https://climatemind.org/",
+      // The mark ships on its own dark teal, so the tile matches it exactly and the
+      // logo bleeds seamlessly instead of sitting in a visible box.
+      brand: {
+        logo: "/climate-mind-logo2.png",
+        bleed: true,
+        from: "#143434",
+        to: "#143434",
+        on: "#ffffff",
+      },
     },
     {
-      slug: "north-star-design",
-      title: "North Star — Design System",
-      summary:
-        "A cross-platform design system adopted by 40 engineers across web, iOS, and Android.",
-      role: "Design systems architect",
-      year: "2023",
-      tags: ["Tokens", "Storybook", "A11y", "Theming"],
-      problem:
-        "Three platform teams shipped three different-looking products from the same brand.",
-      process: [
-        "Defined a single token spine consumed by every platform.",
-        "Automated token sync from Figma to code with a CI pipeline.",
-        "Baked WCAG AA contrast checks into the component test suite.",
+      slug: "gomycode",
+      title: "GoMyCode",
+      summary: "Technology education platform.",
+      role: "Software Developer (Intern)",
+      year: "Oct 2020 — Mar 2021",
+      location: "Lagos, Nigeria",
+      tags: ["React", "Node.js", "Express.js", "MongoDB"],
+      context:
+        "A technology education platform where I worked across the stack alongside a senior engineer — building API endpoints, modernizing the React client, and coordinating the cohort capstone.",
+      highlights: [
+        "Developed REST API endpoints in Node.js and Express against MongoDB, collaborating with a senior engineer on database schema design.",
+        "Refactored a class-based React application to hooks with centralized state management, eliminating prop drilling that had slowed feature delivery.",
+        "Coordinated a cross-functional team of 7 to deliver the cohort capstone project on schedule.",
       ],
       outcome:
-        "Visual consistency scores jumped, and new-feature UI build time dropped ~40%.",
-      hue: 28,
+        "Delivered the cohort capstone on schedule with a 7-person cross-functional team, on a React codebase modernized to hooks and centralized state.",
+      stack: ["JavaScript", "React", "Node.js", "Express.js", "MongoDB"],
+      brand: {
+        logo: "/Gomycode-logo1.svg",
+        from: "#171717",
+        to: "#e60a14",
+        on: "#ffffff",
+      },
+    },
+  ],
+
+  projects: [
+    {
+      name: "Yadsale",
+      blurb:
+        "Social commerce marketplace with escrow-backed payments and courier delivery.",
+      role: "Offer-to-payout flow, mobile marketplace feed, admin console.",
+      href: "https://www.yadsale.com/",
     },
     {
-      slug: "tideline-maps",
-      title: "Tideline — Coastal Mapping",
-      summary:
-        "An interactive map of tidal data for kayakers, with buttery pan/zoom on low-end phones.",
-      role: "Engineer · performance & motion",
-      year: "2022",
-      tags: ["WebGL", "Mapbox", "Performance", "Mobile"],
-      problem:
-        "The map stuttered on the mid-range phones most paddlers actually carry.",
-      process: [
-        "Moved tile compositing to WebGL and tiered the data by zoom.",
-        "Hand-tuned the gesture physics so momentum felt natural.",
-        "Added a reduced-data mode for spotty coastal coverage.",
-      ],
-      outcome:
-        "Sustained 60fps on 4-year-old hardware; featured in two paddling communities.",
-      hue: 192,
+      name: "Korin AI",
+      blurb: "AI music generation platform for African genres.",
+      role: "Led frontend: generation pipeline, adaptive job polling, global audio player, in-browser recording and trimming.",
+      href: "https://usekorinai.com/",
+    },
+    {
+      name: "FilmX",
+      blurb:
+        "Distributor control plane covering 1,000+ titles for 55% of West African cinemas.",
+      role: "Led a team of 4.",
+      href: "https://filmx-web.fusionintel.io/login",
+    },
+    {
+      name: "Ebonylife Cinemas",
+      blurb:
+        "Cinema booking platform with seat selection, loyalty program, and vouchers.",
+      role: "Booking funnel, seat map, technical SEO.",
+      href: "https://ebonylifecinemas.com/",
+    },
+    {
+      name: "Nile Cinemas",
+      blurb: "Cinema booking platform with seat allocation.",
+      role: "Booking experience and technical SEO.",
+      href: "https://nilecinemas.reachcinema.io/",
+    },
+    {
+      name: "Filmhub",
+      blurb: "Landing page and signup flow for a community cinema platform.",
+      role: "Built independently.",
+      href: "https://filmhub.ng/",
+    },
+    {
+      name: "Climate Mind",
+      blurb: "Open-source climate education Progressive Web App.",
+      role: "PWA shell and component library, built with 20 contributors.",
+      href: "https://climatemind.org/",
     },
   ],
 
   about: {
     initials: "IA",
     bio: [
-      "I'm a product engineer who lives in the seam between design and code. I care about the small stuff — the spring on a sheet, the contrast of a label, the frame you dropped on a slow phone — because that's where products earn trust.",
-      "Over the last eight years I've led frontend and design-systems work for fintech, dev tools, and industrial software. I like ambiguous problems, tight feedback loops, and shipping things people actually use every day.",
+      "I'm a frontend engineer in Lagos with 5+ years building and shipping production web applications in commerce, payments, and cinema operations. I work in TypeScript, React, and Next.js, and I own the full delivery cycle — architecture, testing, CI/CD, and deployment.",
+      "I've taken three products from initial commit to live users and led a team of 7 engineers across six production applications. The work I'm proudest of is the unglamorous kind: an escrow flow people trust with their money, a feed that stops stuttering on a mid-range Android, a point-of-sale terminal that keeps selling tickets when the network drops.",
+      "Most of my impact shows up as numbers someone else cares about — 25% more online bookings, 90% less manual data entry, 20% fewer production defects. I like ambiguous problems, tight feedback loops, and shipping things people use every day.",
     ],
-    skills: [
-      "Frontend architecture",
-      "Design systems",
-      "Interaction & motion",
-      "Accessibility",
-      "Performance",
-      "Prototyping",
+    facts: [
+      { label: "Based in", value: "Lagos, Nigeria" },
+      { label: "Experience", value: "5+ years, frontend engineering" },
+      { label: "Currently", value: "Frontend Engineer at Yadsale" },
+      { label: "Education", value: "BSc Applied Botany, University of Lagos" },
     ],
-    tools: [
-      "TypeScript",
-      "React / Next.js",
-      "GSAP",
-      "Tailwind",
-      "Figma",
-      "WebGL",
+    skillGroups: [
+      {
+        title: "Languages & Frameworks",
+        items: [
+          "TypeScript",
+          "JavaScript (ES6+)",
+          "React",
+          "Next.js",
+          "Node.js",
+          "Express.js",
+          "HTML5",
+          "CSS3",
+        ],
+      },
+      {
+        title: "State & Data",
+        items: [
+          "Redux Toolkit",
+          "RTK Query",
+          "TanStack Query",
+          "Jotai",
+          "Redux Persist",
+          "REST APIs",
+          "GraphQL",
+          "WebSockets",
+        ],
+      },
+      {
+        title: "UI & Styling",
+        items: [
+          "Tailwind CSS",
+          "shadcn/ui",
+          "Radix UI",
+          "HeroUI",
+          "Framer Motion",
+          "Material UI",
+          "Responsive Design",
+          "Accessibility (WCAG)",
+        ],
+      },
+      {
+        title: "Forms & Validation",
+        items: ["React Hook Form", "Formik", "Yup", "Zod"],
+      },
+      {
+        title: "Testing & Code Quality",
+        items: [
+          "Vitest",
+          "Jest",
+          "React Testing Library",
+          "SonarQube",
+          "ESLint",
+          "Prettier",
+          "Husky",
+          "Code Review",
+        ],
+      },
+      {
+        title: "DevOps & Cloud",
+        items: [
+          "Docker",
+          "CI/CD",
+          "GitHub Actions",
+          "CapRover",
+          "AWS (Amplify, S3)",
+          "HashiCorp Vault",
+          "Vercel",
+          "Nginx",
+        ],
+      },
+      {
+        title: "Performance & Monitoring",
+        items: [
+          "Core Web Vitals",
+          "SSR / SSG",
+          "Lazy Loading",
+          "Caching",
+          "Sentry",
+          "PostHog",
+          "Google Analytics",
+        ],
+      },
+      {
+        title: "Integrations",
+        items: [
+          "Paystack",
+          "Nomba",
+          "Mapbox",
+          "MongoDB",
+          "Web Audio API",
+          "OAuth",
+          "JWT Auth",
+        ],
+      },
+      {
+        title: "Practices",
+        items: [
+          "Agile / Scrum",
+          "Git",
+          "Jira",
+          "Figma",
+          "Technical SEO",
+          "PWA",
+          "Mentoring",
+          "Technical Leadership",
+        ],
+      },
     ],
   },
 
-  play: [
-    {
-      title: "Adaptive OS Portfolio",
-      blurb: "This site — it wears the native skin of whatever device you open it on.",
-      href: "#",
-      emoji: "🪟",
-    },
-    {
-      title: "Liquid Glass Playground",
-      blurb: "A WebGL sandbox for specular, refractive glass materials in the browser.",
-      href: "#",
-      emoji: "🫧",
-    },
-    {
-      title: "Type Specimen Generator",
-      blurb: "Feed it any variable font; it prints a printable optical-size specimen.",
-      href: "#",
-      emoji: "🔡",
-    },
-    {
-      title: "Tiny Synth",
-      blurb: "A pocket WebAudio synth with a keyboard you can actually play.",
-      href: "#",
-      emoji: "🎹",
-    },
-  ],
-
   contact: {
-    email: "onemole.97@gmail.com",
-    resumeHref: "/resume.pdf",
+    email: "imoleadebanjo97@gmail.com",
+    resumeHref:
+      "https://drive.google.com/file/d/1gq4oej0ufDvKDTbaMWZ8aLzKyd3V8mHc/view?usp=sharing",
+    blurb:
+      "Open to frontend and lead frontend roles, and happy to talk through anything in commerce, payments, or real-time interfaces.",
     links: [
-      { label: "Email", value: "onemole.97@gmail.com", href: "mailto:onemole.97@gmail.com" },
-      { label: "GitHub", value: "@imoleayo", href: "https://github.com" },
-      { label: "LinkedIn", value: "in/imoleayo", href: "https://linkedin.com" },
-      { label: "Twitter / X", value: "@imoleayo", href: "https://x.com" },
+      {
+        label: "Email",
+        value: "imoleadebanjo97@gmail.com",
+        href: "mailto:imoleadebanjo97@gmail.com",
+      },
+      { label: "GitHub", value: "@imole97", href: "https://github.com/imole97" },
+      {
+        label: "LinkedIn",
+        value: "in/imole97",
+        href: "https://www.linkedin.com/in/imole97",
+      },
     ],
   },
 };
@@ -253,8 +495,10 @@ export const sectionMeta: Record<
   SectionId,
   { label: string; emoji: string; title: string }
 > = {
-  work: { label: "Work", emoji: "🗂️", title: "Selected Work" },
+  work: { label: "Work", emoji: "🗂️", title: "Experience" },
   about: { label: "About", emoji: "👤", title: "About Me" },
   settings: { label: "Settings", emoji: "⚙️", title: "Settings" },
-  contact: { label: "Contact", emoji: "✉️", title: "Contact" },
+  // 📇, not ✉️ — the envelope belongs to the Email launcher/mailto action, and the
+  // two shouldn't read as the same destination.
+  contact: { label: "Contact", emoji: "📇", title: "Contact" },
 };

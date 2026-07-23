@@ -64,16 +64,26 @@ export function FluentShell() {
         <Image src={wp.src} alt="" fill priority sizes="100vw" className="object-cover" />
       </div>
 
-      {/* Desktop greeting — visible behind any windows. */}
+      {/* Desktop greeting — visible behind any windows. A soft radial scrim + layered
+          shadow keep it legible over any wallpaper, light or dark. */}
       <div
         className="pointer-events-none absolute left-1/2 top-[14%] z-[1] -translate-x-1/2 px-6 text-center text-white"
-        style={{ textShadow: "0 1px 24px rgba(0,0,0,0.45)" }}
+        style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5), 0 2px 22px rgba(0,0,0,0.4)" }}
       >
-        <p className="text-[13px] uppercase tracking-[0.2em] opacity-80">{content.hero.role}</p>
+        <div
+          aria-hidden
+          className="absolute left-1/2 top-1/2 -z-10 h-[170%] w-[150%] -translate-x-1/2 -translate-y-1/2"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, rgba(0,0,0,0.42), rgba(0,0,0,0.2) 48%, transparent 72%)",
+            filter: "blur(20px)",
+          }}
+        />
+        <p className="text-[13px] uppercase tracking-[0.2em] opacity-90">{content.hero.role}</p>
         <h1 className="mt-2 text-[clamp(2rem,5vw,4rem)] font-semibold tracking-tight">
           {content.hero.name}
         </h1>
-        <p className="mx-auto mt-3 max-w-md text-[15px] opacity-90">{content.hero.thesis}</p>
+        <p className="mx-auto mt-3 max-w-md text-[15px] opacity-95">{content.hero.thesis}</p>
       </div>
 
       {/* Windows */}

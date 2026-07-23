@@ -4,10 +4,12 @@
 // launchers, a Search pill, page dots, and a frosted dock of the portfolio sections.
 // Tapping an app opens it; launchers open external links. (§4.1 iPhone)
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { content, sectionMeta, type SectionId } from "@/lib/content";
 import { useBattery } from "@/lib/useBattery";
 import { BatteryGlyph } from "@/components/BatteryGlyph";
+import { launcherGlyph } from "@/components/BrandIcons";
+import { APPLE_SECTION_ICON, APPLE_LAUNCHER_ICON, AppleIconImage } from "./appleIcons";
 
 const SECTIONS: SectionId[] = ["work", "about", "settings", "contact"];
 
@@ -20,29 +22,31 @@ const SECTION_ICON: Record<SectionId, string> = {
 
 interface Launcher {
   label: string;
-  glyph: string;
+  glyph: ReactNode;
   bg: string;
   fg: string;
+  /** Real app-icon image; when set it fills the tile instead of the glyph. */
+  img?: string;
   href: string;
 }
 
-const LAUNCHER_STYLE: Record<string, { glyph: string; bg: string; fg: string }> = {
-  GitHub: { glyph: "🐙", bg: "#1f2328", fg: "#ffffff" },
-  LinkedIn: { glyph: "in", bg: "#0a66c2", fg: "#ffffff" },
-  "Twitter / X": { glyph: "𝕏", bg: "#000000", fg: "#ffffff" },
+const LAUNCHER_STYLE: Record<string, { glyph: ReactNode; bg: string; fg: string }> = {
+  GitHub: { glyph: launcherGlyph("GitHub", "", 26), bg: "#1f2328", fg: "#ffffff" },
+  LinkedIn: { glyph: launcherGlyph("LinkedIn", "", 26), bg: "#0a66c2", fg: "#ffffff" },
   Email: { glyph: "✉️", bg: "linear-gradient(160deg,#60a5fa,#2563eb)", fg: "#ffffff" },
 };
 
 function buildLaunchers(): Launcher[] {
-  const links = content.contact.links.map((l) => {
+  const links: Launcher[] = content.contact.links.map((l) => {
     const s = LAUNCHER_STYLE[l.label] ?? { glyph: "🔗", bg: "#555", fg: "#ffffff" };
-    return { label: l.label === "Twitter / X" ? "X" : l.label, ...s, href: l.href };
+    return { label: l.label, ...s, img: APPLE_LAUNCHER_ICON[l.label], href: l.href };
   });
   links.push({
     label: "Résumé",
     glyph: "📄",
     bg: "linear-gradient(160deg,#fb7185,#e11d48)",
     fg: "#ffffff",
+    img: undefined,
     href: content.contact.resumeHref,
   });
   return links;
@@ -107,6 +111,7 @@ export function IOSHome({ onOpen, onOpenSearch }: Readonly<IOSHomeProps>) {
               glyph={l.glyph}
               bg={l.bg}
               fg={l.fg}
+              img={l.img}
               onClick={() => openLink(l.href)}
             />
           ))}
@@ -141,6 +146,7 @@ export function IOSHome({ onOpen, onOpenSearch }: Readonly<IOSHomeProps>) {
               glyph={sectionMeta[id].emoji}
               bg={SECTION_ICON[id]}
               fg="#ffffff"
+              img={APPLE_SECTION_ICON[id]}
               onClick={() => onOpen(id)}
             />
           ))}
@@ -214,17 +220,18 @@ function AppIcon({
   glyph,
   bg,
   fg,
+  img,
   onClick,
-}: Readonly<{ label: string; glyph: string; bg: string; fg: string; onClick: () => void }>) {
-  const isLetter = /^[A-Za-z]/.test(glyph);
+}: Readonly<{ label: string; glyph: ReactNode; bg: string; fg: string; img?: string; onClick: () => void }>) {
+  const isLetter = typeof glyph === "string" && /^[A-Za-z]/.test(glyph);
   return (
     <button onClick={onClick} className="flex flex-col items-center gap-1.5 transition-transform active:scale-95">
       <span
         aria-hidden
-        className="grid h-14 w-14 place-items-center rounded-[0.95rem] shadow-lg"
-        style={{ background: bg, color: fg, fontSize: isLetter ? 22 : 26, fontWeight: isLetter ? 700 : 400, lineHeight: 1, textShadow: "none" }}
+        className="grid h-14 w-14 place-items-center overflow-hidden rounded-[0.95rem] shadow-lg"
+        style={img ? { textShadow: "none" } : { background: bg, color: fg, fontSize: isLetter ? 22 : 26, fontWeight: isLetter ? 700 : 400, lineHeight: 1, textShadow: "none" }}
       >
-        {glyph}
+        {img ? <AppleIconImage src={img} label={label} rounded="rounded-[0.95rem]" /> : glyph}
       </span>
       <span className="max-w-[4.5rem] truncate text-[11px] font-medium">{label}</span>
     </button>
@@ -236,17 +243,18 @@ function DockIcon({
   glyph,
   bg,
   fg,
+  img,
   onClick,
-}: Readonly<{ label: string; glyph: string; bg: string; fg: string; onClick: () => void }>) {
-  const isLetter = /^[A-Za-z]/.test(glyph);
+}: Readonly<{ label: string; glyph: ReactNode; bg: string; fg: string; img?: string; onClick: () => void }>) {
+  const isLetter = typeof glyph === "string" && /^[A-Za-z]/.test(glyph);
   return (
     <button
       onClick={onClick}
       aria-label={label}
-      className="grid h-14 w-14 place-items-center rounded-[0.95rem] shadow transition-transform active:scale-90"
-      style={{ background: bg, color: fg, fontSize: isLetter ? 22 : 26, fontWeight: isLetter ? 700 : 400, lineHeight: 1, textShadow: "none" }}
+      className="grid h-14 w-14 place-items-center overflow-hidden rounded-[0.95rem] shadow transition-transform active:scale-90"
+      style={img ? { textShadow: "none" } : { background: bg, color: fg, fontSize: isLetter ? 22 : 26, fontWeight: isLetter ? 700 : 400, lineHeight: 1, textShadow: "none" }}
     >
-      {glyph}
+      {img ? <AppleIconImage src={img} label={label} rounded="rounded-[0.95rem]" /> : glyph}
     </button>
   );
 }

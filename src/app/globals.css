@@ -78,6 +78,23 @@ body {
       var(--glass-shadow);
   }
 
+  /* Reading surface — glass, but opaque enough that body copy never fights the
+     wallpaper behind it. Used by macOS windows and the iPad app panel. (§4.1) */
+  .glass-strong {
+    background: var(--glass-bg-strong, var(--glass-bg));
+  }
+
+  /* Floating overlay surface for skin-agnostic chrome (the skin switcher). Each skin
+     fills in --overlay-* with its own native menu material, so this never depends on
+     variables that only exist under one skin. */
+  .overlay-surface {
+    background: var(--overlay-bg);
+    -webkit-backdrop-filter: blur(var(--overlay-blur)) saturate(160%);
+    backdrop-filter: blur(var(--overlay-blur)) saturate(160%);
+    border: 1px solid var(--overlay-border);
+    box-shadow: var(--overlay-shadow);
+  }
+
   /* Faint top-left specular light on raised surfaces. */
   .glass-specular {
     position: relative;

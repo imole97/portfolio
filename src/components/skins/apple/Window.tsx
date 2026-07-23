@@ -122,7 +122,7 @@ export function Window({
       aria-modal={false}
       onPointerDown={() => manager.focusWindow(state.id)}
       className={cn(
-        "glass glass-specular absolute flex flex-col overflow-hidden rounded-[var(--radius-card)]",
+        "glass glass-strong glass-specular absolute flex flex-col overflow-hidden rounded-[var(--radius-card)]",
         "text-[var(--text-primary)] transition-[filter,opacity] duration-200",
         !focused && "brightness-[0.97] saturate-[0.9]",
       )}

@@ -45,7 +45,7 @@ only the chrome, motion, and materials adapt. See [`DESIGN-SYSTEM.md`](./DESIGN-
   **Material You dynamic color** from it — the whole palette adapts. Wallpaper choice is stored **per
   skin** so each device keeps its own; theme + wallpapers persist in `localStorage`.
 - **Search + battery (all skins):** one shared **search index** (`src/lib/search.ts`) lets recruiters
-  find any content — sections, every case study, each skill/tool, and contact links/résumé — surfaced
+  find any content — sections, every role, every shipped project, each skill, and contact links/résumé — surfaced
   through each skin's native search: macOS **Spotlight** (⌘K), the Windows **Start menu**, iOS/iPadOS
   search (⌘K or the nav search button), and the Android search dock. Each skin's status/menu/tray bar
   also shows a **real battery level** via the Battery Status API (`useBattery`), rendering nothing
@@ -72,8 +72,19 @@ pnpm test     # resolveSkin unit tests (Vitest)
 
 ## Editing content
 
-All portfolio copy lives in one typed file: [`src/lib/content.ts`](./src/lib/content.ts).
-Swap the placeholder hero, case studies, about, play, and contact data — every skin reads from it.
+All portfolio copy lives in one typed file: [`src/lib/content.ts`](./src/lib/content.ts) —
+`hero`, `work` (roles: context, highlights, impact, stack), `projects`, `about`
+(bio, facts, `skillGroups`), and `contact`. Every skin and the shared search index read from it,
+so a single edit propagates to all five skins.
+
+Each role carries a `brand` — its real logo in [`public/`](./public/) plus two colors sampled
+from that logo. [`BrandMark`](./src/components/BrandMark.tsx) renders the tile for every skin:
+dark-on-transparent wordmarks get a light plate, marks that already read on the tile
+(`bleed: true`) sit straight on it, and a missing `logo` falls back to an initials monogram.
+Those same colors drive the card hairline and the tinted stack chips — no invented palettes.
+
+The Résumé launcher and the Contact button both read `contact.resumeHref`, currently a
+Google Drive link. Any URL works; a local `/resume.pdf` in [`public/`](./public/) would too.
 
 ## Structure
 

@@ -41,7 +41,7 @@ export function SkinSwitcher() {
         <div
           role="menu"
           aria-label="Choose a skin"
-          className="glass mb-2 w-72 overflow-hidden rounded-2xl p-1.5"
+          className="overlay-surface mb-2 w-72 overflow-hidden rounded-2xl p-1.5"
         >
           <p className="px-3 pb-1 pt-1.5 text-[11px] opacity-60">
             {ALLOW_ALL_SKINS
@@ -75,7 +75,7 @@ export function SkinSwitcher() {
                   )}
                 </span>
                 {active ? (
-                  <span className="text-accent">●</span>
+                  <span style={{ color: "var(--overlay-accent)" }}>●</span>
                 ) : (
                   opt.skin === nativeSkin && (
                     <span className="text-[10px] uppercase tracking-wide opacity-50">Yours</span>
@@ -91,7 +91,7 @@ export function SkinSwitcher() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label="Skin switcher"
-        className="glass flex items-center gap-2 rounded-full px-3.5 py-2 font-medium transition active:scale-95"
+        className="overlay-surface flex items-center gap-2 rounded-full px-3.5 py-2 font-medium transition active:scale-95"
       >
         <span aria-hidden>🎚️</span>
         <span className="hidden sm:inline">Skin</span>
