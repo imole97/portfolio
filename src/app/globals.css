@@ -115,6 +115,31 @@ body {
   }
 }
 
+/* Interactive elements get a pointer cursor. Browsers don't do this for <button> by
+   default (only links), so every skin's buttons, cards, dock/app icons, tabs, and
+   toggles would otherwise show the arrow. In @layer base so deliberate cursor-*
+   utilities (grab title bars, resize handles, not-allowed disabled, default backdrops)
+   still override it. */
+@layer base {
+  button:not(:disabled),
+  a[href],
+  label:has(input:not(:disabled)),
+  summary,
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"],
+  [role="menuitem"],
+  [role="menuitemradio"],
+  [role="option"],
+  [role="switch"] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
 /* Skin-styled focus ring. (DESIGN-SYSTEM §8) */
 :where(a, button, [tabindex], input):focus-visible {
   outline: 2px solid var(--accent, #0a84ff);

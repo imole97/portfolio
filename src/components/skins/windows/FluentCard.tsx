@@ -15,7 +15,7 @@ export function FluentCard({
     <button
       {...reveal}
       className={cn(
-        "fluent-card reveal block w-full overflow-hidden text-left transition-colors",
+        "fluent-card reveal block w-full cursor-pointer overflow-hidden text-left transition-colors",
         "hover:border-[var(--fl-stroke-strong)]",
         className,
       )}

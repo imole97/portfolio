@@ -103,7 +103,7 @@ export function WorkSection() {
             key={study.slug}
             onClick={() => open(study)}
             className={cn(
-              "work-card group glass glass-specular overflow-hidden rounded-[var(--radius-card)] text-left",
+              "work-card group glass glass-specular cursor-pointer overflow-hidden rounded-[var(--radius-card)] text-left",
               "transition-transform duration-200 hover:-translate-y-0.5",
             )}
           >

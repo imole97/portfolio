@@ -19,7 +19,7 @@ export function MaterialCard({
         onPointerDown?.(e);
       }}
       className={cn(
-        "md-ripple md-surface block w-full rounded-[var(--md-radius-lg)] p-4 text-left",
+        "md-ripple md-surface block w-full cursor-pointer rounded-[var(--md-radius-lg)] p-4 text-left",
         "transition-[transform,background] duration-200 active:scale-[0.99]",
         className,
       )}
